@@ -46,8 +46,8 @@ if(isset($_GET['id'])){
         <div class="row">
             <div class="form-group col-md-4">
                 <select name="gender" id="gender" class="form-control form-control-sm form-control-border" required>
-                    <option <?= isset($gender) && $gender =='Male' ? 'selected' : "" ?>>Male</option>
-                    <option <?= isset($gender) && $gender =='Female' ? 'selected' : "" ?>>Female</option>
+                    <option <?= isset($gender) && $gender =='Hombre' ? 'selected' : "" ?>>Hombre</option>
+                    <option <?= isset($gender) && $gender =='Mujer' ? 'selected' : "" ?>>Mujer</option>
                 </select>
                 <small class="mx-2">Género</small>
             </div>

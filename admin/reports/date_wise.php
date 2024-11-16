@@ -38,7 +38,7 @@ function duration($dur = 0){
 					<form action="" id="filter">
 						<div class="row align-items-end">
 							<div class="form-group col-md-3">
-								<label for="" class="control-label">Emplead@</label>
+								<label for="" class="control-label">Usuari@</label>
                                 <select name="eid" id="eid" class="form-control form-control-sm select2">
                                     <?php 
                                     $employee = $conn->query("SELECT *,CONCAT(firstname,' ',middlename,' ',lastname) as fullname FROM `employee_list` order by CONCAT(firstname,' ',middlename,' ',lastname) asc");
@@ -93,7 +93,7 @@ function duration($dur = 0){
 				</div>
 				<div class="col-8">
 					<h4 class="text-center"><b><?= $_settings->info('name') ?></b></h4>
-					<h3 class="text-center"><b>Tiempo Total Trabajado por Emplead@ <?= $proj ?></b></h3>
+					<h3 class="text-center"><b>Tiempo Total Trabajado por Usuari@ <?= $proj ?></b></h3>
 					<h5 class="text-center"><b><?= $emp ?></b></h5>
 					<h5 class="text-center"><b>a partir de</b></h5>
 					<h5 class="text-center"><b><?= date("F d, Y") ?></b></h5>

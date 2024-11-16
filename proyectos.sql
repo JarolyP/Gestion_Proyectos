@@ -50,9 +50,7 @@ CREATE TABLE `employee_list` (
 --
 
 INSERT INTO `employee_list` (`id`, `code`, `firstname`, `middlename`, `lastname`, `gender`, `email`, `department`, `position`, `password`, `generated_password`, `status`, `avatar`, `date_created`, `date_updated`) VALUES
-(2, '2022-0002', 'Eduardo', '', 'Empleado', 'Male', 'eempleado@cweb.com', 'Tecnologías Información', 'Analista QA', '19e36ca1b52bb940291854cd5cd50328', 'j295eq4f', 1, 'uploads/employee-2.png?v=1642972068', '2022-01-12 13:46:11', '2022-01-23 16:07:48'),
-(6, '2022-0005', 'Juan', '', 'Empleado', 'Male', 'jempleado@cweb.com', 'Tecnologías Información', 'Líder de Desarrollo', '84fb4ea96934cc52c6ab2851c38f8a92', 'g9cd0arm', 1, 'uploads/employee-6.png?v=1642970869', '2022-01-23 15:47:49', '2022-01-23 15:51:39'),
-(9, '2022-0006', 'Daniel', '', 'Velasco', 'Male', 'dvelasco@cweb.com', 'Tecnologías Información', 'Líder de Desarrollo', '3b48c801368b940f94101a114cba17d5', 'i5ggrsmf', 1, 'uploads/employee-9.png?v=1643923822', '2022-02-03 16:30:22', '2022-02-03 16:30:22');
+(1, '2022-2022', 'Jaroly', '', 'Empleado', 'Hombre', 'jobs13az@gmail.com', 'Tecnologías Información', 'Analista QA', '19e36ca1b52bb940291854cd5cd50328', 'jaroly123', 1, 'uploads/employee-2.png?v=1642972068', '2022-01-12 13:46:11', '2022-01-23 16:07:48');
 
 -- --------------------------------------------------------
 
@@ -155,8 +153,7 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `firstname`, `middlename`, `lastname`, `username`, `password`, `avatar`, `last_login`, `type`, `status`, `date_added`, `date_updated`) VALUES
-(1, 'Mauricio', NULL, 'Sevilla', 'configuroweb', '4b67deeb9aba04a5b54632ad19934f26', 'uploads/avatar-1.png?v=1643057611', NULL, 1, 1, '2021-01-20 14:02:37', '2022-01-24 15:53:31'),
-(6, 'Juan', NULL, 'Usuario', 'jusuario', '4b67deeb9aba04a5b54632ad19934f26', 'uploads/avatar-6.png?v=1642971757', NULL, 2, 1, '2022-01-08 16:04:17', '2022-01-23 16:02:37');
+(1, 'Juan', NULL, 'Polanco', 'JuanPolanco', 'Juan1234', 'uploads/avatar-6.png?v=1642971757', NULL, 2, 1, '2022-01-08 16:04:17', '2022-01-23 16:02:37');
 
 -- --------------------------------------------------------
 
