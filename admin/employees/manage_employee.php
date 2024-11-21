@@ -31,8 +31,8 @@ if(isset($_GET['id'])){
         </div>
         <div class="row">
             <div class="form-group col-md-4">
-                <input type="text" name="firstname" id="firstname" placeholder="Juan" autofocus required class="form-control form-control-sm form-control-border" value="<?= isset($firstname) ? $firstname :"" ?>">
-                <small class="mx-2">Nombre</small>
+                <input type="text" name="firstname" id="firstname" placeholder="Primer Nombre" autofocus required class="form-control form-control-sm form-control-border" value="<?= isset($firstname) ? $firstname :"" ?>">
+                <small class="mx-2">Primer Nombre</small>
             </div>
             <div class="form-group col-md-4">
                 <input type="text" name="middlename" required id="middlename" placeholder="(opcional)" class="form-control form-control-sm form-control-border" value="<?= isset($middlename) ? $middlename :"" ?>">
@@ -40,7 +40,7 @@ if(isset($_GET['id'])){
             </div>
             <div class="form-group col-md-4">
                 <input type="text" name="lastname" id="lastname" placeholder="Usuario" required class="form-control form-control-sm form-control-border" value="<?= isset($lastname) ? $lastname :"" ?>">
-                <small class="mx-2">Lastname</small>
+                <small class="mx-2">Apellido</small>
             </div>
         </div>
         <div class="row">

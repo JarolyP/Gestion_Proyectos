@@ -1,23 +1,13 @@
--- phpMyAdmin SQL Dump
--- version 5.1.1
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 03-02-2022 a las 22:36:03
--- Versión del servidor: 10.4.21-MariaDB
--- Versión de PHP: 8.0.11
+
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
 SET time_zone = "+00:00";
 
 
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 */;
-
---
 -- Base de datos: `proyectos`
 --
 
@@ -60,8 +50,11 @@ INSERT INTO `employee_list` (`id`, `code`, `firstname`, `middlename`, `lastname`
 
 CREATE TABLE `project_list` (
   `id` int(30) NOT NULL,
-  `name` text NOT NULL,
-  `description` text NOT NULL,
+  `name` text NOT NULL COMMENT 'Nombre del Proyecto',
+  `description` text NOT NULL COMMENT 'Descripción',
+  `estimated_start_date` datetime NOT NULL COMMENT 'Fecha Estimada de Inicio',
+  `estimated_end_date` datetime NOT NULL COMMENT 'Fecha Estimada de Fin',
+  `responsable` text NOT NULL COMMENT 'Responsable',
   `status` tinyint(1) NOT NULL DEFAULT 0 COMMENT '0= New, 1= In-Progress, 2= Closed',
   `delete_flag` tinyint(1) NOT NULL DEFAULT 0,
   `date_created` datetime NOT NULL DEFAULT current_timestamp(),
@@ -73,8 +66,7 @@ CREATE TABLE `project_list` (
 --
 
 INSERT INTO `project_list` (`id`, `name`, `description`, `status`, `delete_flag`, `date_created`, `date_updated`) VALUES
-(6, 'Proyecto Análisis Bases de Datos', 'Proyectos de análisis de información de las bases de datos del departamento de IT de la Empresa AMCORD', 1, 0, '2022-01-23 15:43:14', '2022-01-23 15:53:21'),
-(7, 'Implementar Sistema Gestor de Tareas', 'Se modifica el sistema Gestor de Tareas, se le generan nuevas pantallas.', 1, 0, '2022-02-03 16:27:42', '2022-02-03 16:31:58');
+(6, 'Proyecto Análisis Bases de Datos', 'Proyectos de análisis de información de las bases de datos del departamento de IT de la Empresa AMCORD', 1, 0, '2022-01-23 15:43:14', '2022-01-23 15:53:21');
 
 -- --------------------------------------------------------
 
@@ -100,9 +92,7 @@ CREATE TABLE `report_list` (
 --
 
 INSERT INTO `report_list` (`id`, `project_id`, `employee_id`, `work_type_id`, `description`, `datetime_from`, `datetime_to`, `duration`, `date_created`, `date_updated`) VALUES
-(8, 6, 6, 5, '&lt;p&gt;Se realizan las validaciones pertinentes de&amp;nbsp;&lt;span style=&quot;font-size: 1rem;&quot;&gt;Recopilaci&oacute;n de informaci&oacute;n, Autenticaci&oacute;n, Denegaci&oacute;n de Servicio, Sesiones, Validaci&oacute;n de Datos, Inspecciones Manuales, Modelamiento de Amenazas.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Pendientes 3 sesiones de pruebas m&aacute;s.&lt;/p&gt;', '2022-01-23 16:00:00', '2022-01-23 17:00:00', 3600, '2022-01-23 16:00:16', NULL),
-(9, 6, 2, 4, '&lt;p&gt;Se valida la calidad de las conexiones de la base de datos principal, la que valida las credenciales de los usuarios con cinco niveles de acceso.&lt;/p&gt;&lt;p&gt;Se coteja la redundancia entre los servidores de seguridad, los tiempos de respuesta son los esperados.&lt;/p&gt;', '2022-01-23 16:00:00', '2022-01-23 17:00:00', 3600, '2022-01-23 16:12:13', NULL),
-(10, 7, 9, 2, '&lt;p&gt;Se realiza la primera reuni&oacute;n del proyecto con el objeto de tomar todos los requerimientos espec&iacute;ficos de los cambios a realizar en la aplicaci&oacute;n.&lt;/p&gt;', '2022-02-04 16:00:00', '2022-02-04 20:00:00', 14400, '2022-02-03 16:31:57', '2022-02-03 16:33:08');
+(8, 6, 6, 5, '&lt;p&gt;Se realizan las validaciones pertinentes de&amp;nbsp;&lt;span style=&quot;font-size: 1rem;&quot;&gt;Recopilaci&oacute;n de informaci&oacute;n, Autenticaci&oacute;n, Denegaci&oacute;n de Servicio, Sesiones, Validaci&oacute;n de Datos, Inspecciones Manuales, Modelamiento de Amenazas.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Pendientes 3 sesiones de pruebas m&aacute;s.&lt;/p&gt;', '2022-01-23 16:00:00', '2022-01-23 17:00:00', 3600, '2022-01-23 16:00:16', NULL);
 
 -- --------------------------------------------------------
 
@@ -176,15 +166,7 @@ CREATE TABLE `work_type_list` (
 --
 
 INSERT INTO `work_type_list` (`id`, `name`, `description`, `status`, `delete_flag`, `date_created`, `date_updated`) VALUES
-(1, 'Soporte Técnico', 'El soporte técnico, por lo tanto, es una asistencia que brindan las empresas para que sus clientes puedan hacer uso de sus productos o servicios.', 1, 0, '2022-01-12 11:30:31', '2022-01-23 16:23:38'),
-(2, 'Tecnología', 'La tecnología es el conjunto de conocimientos y técnicas que se aplican de manera ordenada para alcanzar un determinado objetivo o resolver un problema.', 1, 0, '2022-01-12 11:31:53', '2022-01-23 16:26:31'),
-(3, 'Validación Conexiones', 'Definición de consulta de validación, Obligatoria. Manejo de las conexiones con la base de datos, Obligatoria. Configuración del auto-commit, Obligatoria.', 1, 0, '2022-01-12 11:32:15', '2022-01-23 16:21:07'),
-(4, 'Control de Calidad', 'La función principal del control de calidad es asegurar que los productos o servicios cumplan con los requisitos mínimos de calidad.', 1, 0, '2022-01-12 11:32:36', '2022-01-23 16:19:51'),
-(5, 'Pruebas QA', 'En primer lugar tenemos las Pruebas Software Funcionales. Típicamente encontraremos el comportamiento del sistema, subsistema o componente software descrito en las especificaciones de requisitos o casos de uso, aunque también puede no estar documentado («que funcione como el sistema al que sustituye») . Es decir, con las funciones establecemos “lo que el sistema hace”.', 1, 0, '2022-01-12 11:33:13', '2022-01-23 16:27:31'),
-(6, 'Diseño GUI', 'Una interfaz gráfica de usuario (GUI), es donde coinciden el diseño de la interacción y el de la interfaz. Una interfaz es sólo la manifestación visual de \"inter\" actividades; sólo es un aspecto del diseño de interacción, no el mismo diseño de la interacción.', 1, 0, '2022-01-12 11:34:54', '2022-01-23 16:16:43'),
-(7, 'Mantenimiento Infraestructura', 'Es la actividad relacionada con la conservación de la infraestructura, maquinaria y equipo, que permite un mejor desempeño de operación del bien y reducción del nivel de riesgo de fallos y/o daños humanos y materiales.', 0, 0, '2022-01-12 11:35:14', '2022-01-23 16:18:57'),
-(8, 'Beta Testing', 'n faucibus posuere sodales. Maecenas euismod, neque id consectetur ullamcorper, nisi erat ultrices urna, sit amet auctor odio magna vitae magna. Suspendisse a diam pellentesque, efficitur lacus eu, facilisis lacus', 1, 1, '2022-01-12 11:35:31', '2022-01-12 11:35:37');
-
+(1, 'Soporte Técnico', 'El soporte técnico, por lo tanto, es una asistencia que brindan las empresas para que sus clientes puedan hacer uso de sus productos o servicios.', 1, 0, '2022-01-12 11:30:31', '2022-01-23 16:23:38');
 --
 -- Índices para tablas volcadas
 --
@@ -200,6 +182,7 @@ ALTER TABLE `employee_list`
 --
 ALTER TABLE `project_list`
   ADD PRIMARY KEY (`id`);
+
 
 --
 -- Indices de la tabla `report_list`
@@ -268,9 +251,6 @@ ALTER TABLE `users`
 ALTER TABLE `work_type_list`
   MODIFY `id` int(30) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
---
--- Restricciones para tablas volcadas
---
 
 --
 -- Filtros para la tabla `report_list`
@@ -281,6 +261,4 @@ ALTER TABLE `report_list`
   ADD CONSTRAINT `report_list_ibfk_3` FOREIGN KEY (`employee_id`) REFERENCES `employee_list` (`id`) ON DELETE CASCADE;
 COMMIT;
 
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+

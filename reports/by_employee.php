@@ -43,9 +43,9 @@ function duration($dur = 0){
 				</div>
 				<div class="col-8">
 					<h4 class="text-center"><b><?= $_settings->info('name') ?></b></h4>
-					<h3 class="text-center"><b>Informe de tiempo prestado del@ emplead@ por proyecto</b></h3>
+					<h3 class="text-center"><b>Informe de tiempo prestado del usuario por proyecto</b></h3>
 					<h5 class="text-center"><b><?= $emp ?></b></h5>
-					<h5 class="text-center"><b>A la fecha de</b></h5>
+					<h5 class="text-center"><b>Hasta la fecha de</b></h5>
 					<h5 class="text-center"><b><?= date("F d, Y") ?></b></h5>
 				</div>
 				<div class="col-2"></div>

@@ -38,7 +38,7 @@ function duration($dur = 0){
 					<form action="" id="filter">
 						<div class="row align-items-end">
 							<div class="form-group col-md-3">
-								<label for="" class="control-label">Usuari@</label>
+								<label for="" class="control-label">Usuario</label>
                                 <select name="eid" id="eid" class="form-control form-control-sm select2">
                                     <?php 
                                     $employee = $conn->query("SELECT *,CONCAT(firstname,' ',middlename,' ',lastname) as fullname FROM `employee_list` order by CONCAT(firstname,' ',middlename,' ',lastname) asc");
