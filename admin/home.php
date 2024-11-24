@@ -12,6 +12,7 @@ function duration($dur = 0){
 }
 ?>
 <div class="row">
+<<<<<<< HEAD
         <div class="col-md-8">
         <div class="card card-outline card-success">
           <div class="card-header">
@@ -117,6 +118,8 @@ function duration($dur = 0){
         </div>
       </div>
 <!-- <div class="row">
+=======
+>>>>>>> 1b45fe63b38a4569f2263a092e494b7082413516
     <div class="col-12 col-sm-12 col-md-6 col-lg-3">
         <div class="info-box bg-gradient-light shadow">
             <span class="info-box-icon bg-gradient-primary elevation-1"><i class="fas fa-tasks"></i></span>
@@ -129,9 +132,15 @@ function duration($dur = 0){
                 ?>
             </span>
             </div>
+<<<<<<< HEAD
             <!-- /.info-box-content 
         </div>
        <!-- /.info-box
+=======
+            <!-- /.info-box-content -->
+        </div>
+        <!-- /.info-box -->
+>>>>>>> 1b45fe63b38a4569f2263a092e494b7082413516
     </div>
     <div class="col-12 col-sm-12 col-md-6 col-lg-3">
         <div class="info-box bg-gradient-light shadow">
@@ -145,9 +154,15 @@ function duration($dur = 0){
                 ?>
             </span>
             </div>
+<<<<<<< HEAD
             <!-- /.info-box-content 
         </div>
         <!-- /.info-box 
+=======
+            <!-- /.info-box-content -->
+        </div>
+        <!-- /.info-box -->
+>>>>>>> 1b45fe63b38a4569f2263a092e494b7082413516
     </div>
     <div class="col-12 col-sm-12 col-md-6 col-lg-3">
         <div class="info-box bg-gradient-light shadow">
@@ -161,9 +176,15 @@ function duration($dur = 0){
                 ?>
             </span>
             </div>
+<<<<<<< HEAD
             <!-- /.info-box-content 
         </div>
         <!-- /.info-box 
+=======
+            <!-- /.info-box-content -->
+        </div>
+        <!-- /.info-box -->
+>>>>>>> 1b45fe63b38a4569f2263a092e494b7082413516
     </div>
     <div class="col-12 col-sm-12 col-md-6 col-lg-3">
         <div class="info-box bg-gradient-light shadow">
@@ -177,9 +198,15 @@ function duration($dur = 0){
                 ?>
             </span>
             </div>
+<<<<<<< HEAD
             <!-- /.info-box-content 
         </div>
         <!-- /.info-box 
+=======
+            <!-- /.info-box-content -->
+        </div>
+        <!-- /.info-box -->
+>>>>>>> 1b45fe63b38a4569f2263a092e494b7082413516
     </div>
     <div class="col-12 col-sm-12 col-md-6 col-lg-3">
         <div class="info-box bg-gradient-light shadow">
@@ -193,6 +220,7 @@ function duration($dur = 0){
                 ?>
             </span>
             </div>
+<<<<<<< HEAD
             <!-- /.info-box-content 
         </div>
         <!-- /.info-box 
@@ -281,3 +309,12 @@ function duration($dur = 0){
 
 </div>
 <hr> -->
+=======
+            <!-- /.info-box-content -->
+        </div>
+        <!-- /.info-box -->
+    </div>
+   
+</div>
+<hr>
+>>>>>>> 1b45fe63b38a4569f2263a092e494b7082413516

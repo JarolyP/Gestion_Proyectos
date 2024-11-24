@@ -1,4 +1,5 @@
 # Sistema de Gestión de Proyectos en PHP y MYSQL
+<<<<<<< HEAD
 <img src="Sistema%20de%20Gestión%20de%20Proyectos%20en%20PHP%20y%20MYSQL.png">
 
 <!-- wp:paragraph -->
@@ -35,3 +36,8 @@ https://configuroweb.com/WhatsappMessenger
 # El siguiente es el post relacionado con la aplicación
 
 https://www.configuroweb.com/sistema-de-gestion-de-proyectos/
+=======
+
+
+
+>>>>>>> 1b45fe63b38a4569f2263a092e494b7082413516

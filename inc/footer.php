@@ -56,12 +56,18 @@
   })
 </script>
 <footer class="main-footer text-sm">
+<<<<<<< HEAD
         <strong>Copyright © <?php echo date('Y') ?>. 
         <!-- <a href=""></a> -->
         </strong>
         All rights reserved.
         <div class="float-right d-none d-sm-inline-block">
           <b><?php echo $_settings->info('short_name') ?> Para más desarrollos <a href="https://configuroweb.com" target="blank">ConfiguroWeb</a></b>
+=======
+        All rights reserved.
+        <div class="float-right d-none d-sm-inline-block">
+          <b><?php echo $_settings->info('short_name') ?>Jaroly Polanco</b>
+>>>>>>> 1b45fe63b38a4569f2263a092e494b7082413516
         </div>
       </footer>
     </div>
