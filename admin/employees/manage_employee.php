@@ -40,14 +40,14 @@ if(isset($_GET['id'])){
             </div>
             <div class="form-group col-md-4">
                 <input type="text" name="lastname" id="lastname" placeholder="Usuario" required class="form-control form-control-sm form-control-border" value="<?= isset($lastname) ? $lastname :"" ?>">
-                <small class="mx-2">Lastname</small>
+                <small class="mx-2">Apellido</small>
             </div>
         </div>
         <div class="row">
             <div class="form-group col-md-4">
                 <select name="gender" id="gender" class="form-control form-control-sm form-control-border" required>
-                    <option <?= isset($gender) && $gender =='Male' ? 'selected' : "" ?>>Male</option>
-                    <option <?= isset($gender) && $gender =='Female' ? 'selected' : "" ?>>Female</option>
+                    <option <?= isset($gender) && $gender =='Hombre' ? 'selected' : "" ?>>Hombre</option>
+                    <option <?= isset($gender) && $gender =='Mujer' ? 'selected' : "" ?>>Mujer</option>
                 </select>
                 <small class="mx-2">Género</small>
             </div>

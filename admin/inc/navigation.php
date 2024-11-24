@@ -47,6 +47,14 @@
                         </p>
                       </a>
                     </li>
+                    <li class="nav-item">
+                      <a href="<?php echo base_url ?>admin/?page=Task" class="nav-link nav-Task">
+                        <i class="nav-icon fas fa-tasks"></i>
+                        <p>
+                          Lista de Tareas
+                        </p>
+                      </a>
+                    </li>
                     <li class="nav-header">Reports</li>
                       <li class="nav-item dropdown">
                         <a href="<?php echo base_url ?>admin/?page=reports/rendered_time" class="nav-link nav-reports_rendered_time">
@@ -68,7 +76,15 @@
                         <a href="<?php echo base_url ?>admin/?page=reports/date_wise" class="nav-link nav-reports_date_wise">
                           <i class="nav-icon fas fa-circle"></i>
                           <p>
-                          Tiempo por empleado asignado
+                          Tiempo por empleado
+                          </p>
+                        </a>
+                      </li>
+                      <li class="nav-item dropdown">
+                        <a href="<?php echo base_url ?>admin/?page=reports/date_wise" class="nav-link nav-reports_date_wise">
+                          <i class="nav-icon fas fa-circle"></i>
+                          <p>
+                          Tiempo por Tarea
                           </p>
                         </a>
                       </li>

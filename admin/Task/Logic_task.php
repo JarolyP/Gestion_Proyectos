@@ -1,6 +1,6 @@
 <?php
 require_once('../config.php');
-Class Master extends DBConnection {
+Class Logic_task extends DBConnection {
 	private $settings;
 	public function __construct(){
 		global $_settings;
@@ -20,7 +20,7 @@ Class Master extends DBConnection {
 			exit;
 		}
 	}
-	function save_project(){
+	function save_task(){
 		extract($_POST);
 		$data = "";
 	
@@ -34,35 +34,25 @@ Class Master extends DBConnection {
 			}
 		}
 	
-		// Verificar si el proyecto ya existe (por nombre y excluir el actual si se está actualizando)
-		$check = $this->conn->query("SELECT * FROM `project_list` WHERE `title` = '{$title}' ".(is_numeric($id) && $id > 0 ? " AND id != '{$id}'" : "")." ")->num_rows;
-		if($check > 0){
-			$resp['status'] = 'failed';
-			$resp['msg'] = 'El proyecto ya existe.';
+		// Crear o actualizar la tarea
+		if(empty($id)){
+			$sql = "INSERT INTO `task_list` SET {$data}";
 		} else {
-			// Crear o actualizar el registro
-			if(empty($id)){
-				$sql = "INSERT INTO `project_list` SET {$data} ";
-			} else {
-				$sql = "UPDATE `project_list` SET {$data} WHERE id = '{$id}' ";
-			}
+			$sql = "UPDATE `task_list` SET {$data} WHERE id = '{$id}'";
+		}
 	
-			// Ejecutar la consulta
-			$save = $this->conn->query($sql);
-			if($save){
-				$rid = !empty($id) ? $id : $this->conn->insert_id; // Obtener ID generado si es nuevo
-				$resp['id'] = $rid;
-				$resp['status'] = 'success';
-				if(empty($id))
-					$resp['msg'] = "Proyecto agregado exitosamente.";
-				else
-					$resp['msg'] = "Proyecto actualizado exitosamente.";
-			} else {
-				// Manejar errores de la consulta
-				$resp['status'] = 'failed';
-				$resp['msg'] = "Ocurrió un error al guardar los datos.";
-				$resp['err'] = $this->conn->error."[{$sql}]";
-			}
+		// Ejecutar la consulta
+		$save = $this->conn->query($sql);
+		if($save){
+			$rid = !empty($id) ? $id : $this->conn->insert_id; // Obtener ID generado si es nuevo
+			$resp['id'] = $rid;
+			$resp['status'] = 'success';
+			$resp['msg'] = empty($id) ? "Tarea guardada exitosamente." : "Tarea actualizada exitosamente.";
+		} else {
+			// Manejar errores de la consulta
+			$resp['status'] = 'failed';
+			$resp['msg'] = "Ocurrió un error al guardar los datos.";
+			$resp['err'] = $this->conn->error."[{$sql}]";
 		}
 	
 		// Agregar mensaje flash si se guarda correctamente
@@ -70,39 +60,56 @@ Class Master extends DBConnection {
 			$this->settings->set_flashdata('success', $resp['msg']);
 	
 		return json_encode($resp); // Devolver respuesta en formato JSON
-	}
-	
-	function delete_project(){
+	}	
+	function delete_task(){
 		extract($_POST);
-		$check = $this->conn->query("SELECT * FROM `report_list` where project_id ='{$id}'")->num_rows;
+	
+		// Verificar si la tarea existe
+		$check = $this->conn->query("SELECT * FROM `task_list` WHERE id = '{$id}'")->num_rows;
 		if($check > 0){
-			$resp['status'] = 'failed';
-			$resp['mesg'] = 'No se puede eliminar este proyecto porque ya tiene un informe listado.';
-		}else{
-			$del = $this->conn->query("UPDATE `project_list` set delete_flag = 1 where id = '{$id}'");
+			// Eliminar la tarea
+			$del = $this->conn->query("DELETE FROM `task_list` WHERE id = '{$id}'");
 			if($del){
 				$resp['status'] = 'success';
-				$this->settings->set_flashdata('success',"Proyect ha sido eliminado exitósamente.");
-			}else{
+				$resp['msg'] = "Tarea eliminada exitosamente.";
+				$this->settings->set_flashdata('success', $resp['msg']);
+			} else {
 				$resp['status'] = 'failed';
-				$resp['error'] = $this->conn->error;
+				$resp['msg'] = "No se pudo eliminar la tarea.";
+				$resp['err'] = $this->conn->error;
 			}
-		}
-		return json_encode($resp);
-	}
-	function close_project(){
-		extract($_POST);
-		
-		$update = $this->conn->query("UPDATE `project_list` set status = 2 where id = '{$id}'");
-		if($update){
-			$resp['status'] = 'success';
-			$this->settings->set_flashdata('success',"Proyecto ha sido cerrado exitósamente.");
-		}else{
+		} else {
 			$resp['status'] = 'failed';
-			$resp['error'] = $this->conn->error;
+			$resp['msg'] = "La tarea no existe o ya ha sido eliminada.";
 		}
-		return json_encode($resp);
+	
+		return json_encode($resp); // Devolver respuesta en formato JSON
+	}	
+	function close_task(){
+		extract($_POST);
+	
+		// Verificar si la tarea existe
+		$check = $this->conn->query("SELECT * FROM `task_list` WHERE id = '{$id}'")->num_rows;
+		if($check > 0){
+			// Actualizar el estado de la tarea a 'Completada'
+			$update = $this->conn->query("UPDATE `task_list` SET status = 'Completada', actual_end_date = NOW() WHERE id = '{$id}'");
+			if($update){
+				$resp['status'] = 'success';
+				$resp['msg'] = "Tarea cerrada exitosamente.";
+				$this->settings->set_flashdata('success', $resp['msg']);
+			} else {
+				$resp['status'] = 'failed';
+				$resp['msg'] = "No se pudo cerrar la tarea.";
+				$resp['err'] = $this->conn->error;
+			}
+		} else {
+			$resp['status'] = 'failed';
+			$resp['msg'] = "La tarea no existe o ya ha sido cerrada.";
+		}
+	
+		return json_encode($resp); // Devolver respuesta en formato JSON
 	}
+	
 	function save_work_type(){
 		extract($_POST);
 		$data = "";

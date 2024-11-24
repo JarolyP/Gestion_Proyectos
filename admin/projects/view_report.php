@@ -26,35 +26,45 @@ function duration($dur = 0){
     <div class="row">
         <div class="col-md-12">
             <dl>
-                <dt class="text-muted">Empleado</dt>
-                <dd class='pl-4 fs-4'><?= isset($ecode) ? $ecode. " - " . $fullname : 'N/A' ?></dd>
+                <dt class="text-muted">Tarea</dt>
+                <dd class='pl-4 fs-4'><?= isset($task) ? $task : 'N/A' ?></dd>
             </dl>
         </div>
     </div>
     <div class="row">
         <div class="col-md-6">
             <dl>
-                
-                <dt class="text-muted">Fecha de Inicio</dt>
-                <dd class='pl-4 fs-4'><?= isset($datetime_from) ? date("M d, Y h:i A",strtotime($datetime_from)) : 'N/A' ?></dd>
-                <dt class="text-muted">Tipo de Trabajo</dt>
-                <dd class='pl-4 fs-4 fw-bold'><?= isset($work_type) ? $work_type : 'N/A' ?></dd>
-                
+                <dt class="text-muted">Descripción</dt>
+                <dd class='pl-4 fs-4'><?= isset($description) ? html_entity_decode($description) : 'N/A' ?></dd>
+                <dt class="text-muted">Fecha Estimada de Inicio</dt>
+                <dd class='pl-4 fs-4'><?= isset($estimated_start_date) ? date("M d, Y", strtotime($estimated_start_date)) : 'N/A' ?></dd>
+                <dt class="text-muted">Fecha Real de Inicio</dt>
+                <dd class='pl-4 fs-4'><?= isset($actual_start_date) ? date("M d, Y", strtotime($actual_start_date)) : 'N/A' ?></dd>
+                <dt class="text-muted">Responsable</dt>
+                <dd class='pl-4 fs-4'><?= isset($responsible) ? $responsible : 'N/A' ?></dd>
             </dl>
         </div>
         <div class="col-md-6">
             <dl>
-                <dt class="text-muted">Hasta</dt>
-                <dd class='pl-4 fs-4'><?= isset($datetime_to) ? date("M d, Y h:i A",strtotime($datetime_to)) : 'N/A' ?></dd>
-                <dt class="text-muted">Duración</dt>
-                <dd class='pl-4 fs-4'><?= isset($duration) ? duration($duration) : 'N/A' ?></dd>
+                <dt class="text-muted">Fecha Estimada de Finalización</dt>
+                <dd class='pl-4 fs-4'><?= isset($estimated_end_date) ? date("M d, Y", strtotime($estimated_end_date)) : 'N/A' ?></dd>
+                <dt class="text-muted">Fecha Real de Finalización</dt>
+                <dd class='pl-4 fs-4'><?= isset($actual_end_date) ? date("M d, Y", strtotime($actual_end_date)) : 'N/A' ?></dd>
+                <dt class="text-muted">Progreso</dt>
+                <dd class='pl-4 fs-4'><?= isset($progress) ? $progress . "%" : 'N/A' ?></dd>
+                <dt class="text-muted">Estado</dt>
+                <dd class='pl-4 fs-4 fw-bold'><?= isset($status) ? $status : 'N/A' ?></dd>
+                <dt class="text-muted">Tipo de Tarea</dt>
+                <dd class='pl-4 fs-4'><?= isset($task_type) ? $task_type : 'N/A' ?></dd>
             </dl>
         </div>
     </div>
     <div class="row">
         <div class="col-md-12">
-            <label for="" class="text-muted control-label">Descripción</label>
-            <div><?= html_entity_decode($description) ?></div>
+            <dl>
+                <dt class="text-muted">Fecha de Creación</dt>
+                <dd class='pl-4 fs-4'><?= isset($date_created) ? date("M d, Y h:i A", strtotime($date_created)) : 'N/A' ?></dd>
+            </dl>
         </div>
     </div>
     <div class="text-right">
@@ -65,6 +75,7 @@ function duration($dur = 0){
         <button class="btn btn-dark btn-sm btn-flat" type="button" data-dismiss="modal"><i class="fa fa-close"></i> Cerrar</button>
     </div>
 </div>
+
 <script>
     $(function(){
         $('#edit_report').click(function(){

@@ -8,10 +8,10 @@
 </style>
 <div class="card card-outline card-primary rounded-0 shadow">
     <div class="card-header">
-        <h3 class="card-title">Lista de Proyectos</h3>
+        <h3 class="card-title">Lista de Tareas</h3>
         <div class="card-tools">
             <a href="javascript:void(0)" id="create_new" class="btn btn-flat btn-sm btn-primary">
-                <span class="fas fa-plus"></span> Agregar Nuevo Proyecto
+                <span class="fas fa-plus"></span> Agregar Nueva Tarea
             </a>
         </div>
     </div>
@@ -21,10 +21,10 @@
                 <colgroup>
                     <col width="5%">
                     <col width="15%">
-                    <col width="15%">
-                    <col width="15%">
                     <col width="20%">
-                    <col width="10%">
+                    <col width="15%">
+                    <col width="15%">
+                    <col width="15%">
                     <col width="10%">
                     <col width="10%">
                 </colgroup>
@@ -32,9 +32,9 @@
                     <tr class="bg-gradient-primary text-light">
                         <th>#</th>
                         <th>Fecha de Creación</th>
-                        <th>Título</th>
-                        <th>Fecha de Inicio</th>
-                        <th>Fecha de Fin</th>
+                        <th>Tarea</th>
+                        <th>Fecha de Inicio Estimada</th>
+                        <th>Fecha de Fin Estimada</th>
                         <th>Responsable</th>
                         <th>Estado</th>
                         <th>Acción</th>
@@ -43,36 +43,30 @@
                 <tbody>
                     <?php 
                         $i = 1;
-                        $qry = $conn->query("SELECT * from `project_list` where delete_flag = 0 order by `title` asc ");
+                        $qry = $conn->query("SELECT * from `task_list` where status != 'Cancelada' order by `task` asc");
                         while($row = $qry->fetch_assoc()):
                     ?>
                     <tr>
                         <td class="text-center"><?php echo $i++; ?></td>
                         <td class=""><?php echo date("Y-m-d H:i", strtotime($row['date_created'])) ?></td>
-                        <td class=""><p class="m-0 truncate-1"><?php echo $row['title'] ?></p></td>
-                        <td class=""><?php echo $row['start_date'] ? date("Y-m-d", strtotime($row['start_date'])) : 'No definida'; ?></td>
-                        <td class=""><?php echo $row['end_date'] ? date("Y-m-d", strtotime($row['end_date'])) : 'No definida'; ?></td>
+                        <td class=""><p class="m-0 truncate-1"><?php echo $row['task'] ?></p></td>
+                        <td class=""><?php echo $row['estimated_start_date'] ? date("Y-m-d", strtotime($row['estimated_start_date'])) : 'No definida'; ?></td>
+                        <td class=""><?php echo $row['estimated_end_date'] ? date("Y-m-d", strtotime($row['estimated_end_date'])) : 'No definida'; ?></td>
                         <td class=""><p class="m-0 truncate-1"><?php echo $row['responsible'] ?></p></td>
                         <td class="text-center">
                             <?php 
                                 switch ($row['status']){
-                                    case 'Nuevo':
-                                        echo '<span class="rounded-pill badge badge-success bg-gradient-teal px-3">Nuevo</span>';
+                                    case 'Pendiente':
+                                        echo '<span class="rounded-pill badge badge-warning bg-gradient-warning px-3">Pendiente</span>';
                                         break;
                                     case 'En Proceso':
                                         echo '<span class="rounded-pill badge badge-primary bg-gradient-primary px-3">En Proceso</span>';
                                         break;
-                                    case 'Cancelado':
-                                        echo '<span class="rounded-pill badge badge-danger bg-gradient-danger px-3">Cancelado</span>';
+                                    case 'Completada':
+                                        echo '<span class="rounded-pill badge badge-success bg-gradient-teal px-3">Completada</span>';
                                         break;
-                                    case 'Terminado':
-                                        echo '<span class="rounded-pill badge badge-success bg-gradient-green px-3">Terminado</span>';
-                                        break;
-                                    case 'Pendiente':
-                                        echo '<span class="rounded-pill badge badge-warning bg-gradient-warning px-3">Pendiente</span>';
-                                        break;
-                                    case 'Cerrado':
-                                        echo '<span class="rounded-pill badge badge-dark bg-gradient-dark px-3 text-light">Cerrado</span>';
+                                    case 'Cancelada':
+                                        echo '<span class="rounded-pill badge badge-danger bg-gradient-danger px-3">Cancelada</span>';
                                         break;
                                 }
                             ?>
@@ -83,10 +77,10 @@
                                 <span class="sr-only">Toggle Dropdown</span>
                             </button>
                             <div class="dropdown-menu" role="menu">
-                                <a class="dropdown-item" href="./?page=projects/view_project&id=<?= $row['id'] ?>" data-id="<?php echo $row['id'] ?>">
+                                <a class="dropdown-item" href="./?page=tasks/view_task&id=<?= $row['id'] ?>" data-id="<?php echo $row['id'] ?>">
                                     <span class="fa fa-eye text-dark"></span> Ver
                                 </a>
-                                <?php if($row['status'] != 'Cerrado'): ?>
+                                <?php if($row['status'] != 'Cancelada'): ?>
                                 <div class="dropdown-divider"></div>
                                 <a class="dropdown-item edit_data" href="javascript:void(0)" data-id="<?php echo $row['id'] ?>">
                                     <span class="fa fa-edit text-primary"></span> Editar
@@ -105,10 +99,11 @@
         </div>
     </div>
 </div>
+
 <script>
 	$(document).ready(function(){
         $('#create_new').click(function(){
-			uni_modal("Agregar Nuevo Proyecto","projects/manage_project.php")
+			uni_modal("Agregar Nuevo Tarea","Task/manage_task.php")
 		})
 		$('.view_data').click(function(){
 			uni_modal("Información del Proyecto","projects/view_project.php?id="+$(this).attr('data-id'))

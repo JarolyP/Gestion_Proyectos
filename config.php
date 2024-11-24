@@ -1,7 +1,7 @@
 <?php
 ob_start();
-ini_set('date.timezone','Asia/Manila');
-date_default_timezone_set('Asia/Manila');
+ini_set('date.timezone', 'America/Santo_Domingo');
+date_default_timezone_set('America/Santo_Domingo');
 session_start();
 
 require_once('initialize.php');
