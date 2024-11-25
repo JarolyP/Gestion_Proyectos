@@ -56,10 +56,7 @@
   })
 </script>
 <footer class="main-footer text-sm">
-<<<<<<< HEAD
         <strong>Copyright © <?php echo date('Y') ?>. 
-=======
->>>>>>> 1b45fe63b38a4569f2263a092e494b7082413516
         <!-- <a href=""></a> -->
         </strong>
         All rights reserved.

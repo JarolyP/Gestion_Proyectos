@@ -1,10 +1,6 @@
 <?php
 ob_start();
-<<<<<<< HEAD
-ini_set('date.timezone', 'America/Santo_Domingo');
-=======
 ini_set('date.timezone','America/Santo_Domingo');
->>>>>>> 1b45fe63b38a4569f2263a092e494b7082413516
 date_default_timezone_set('America/Santo_Domingo');
 session_start();
 

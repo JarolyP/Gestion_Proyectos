@@ -23,7 +23,6 @@ Class Master extends DBConnection {
 	function save_project(){
 		extract($_POST);
 		$data = "";
-<<<<<<< HEAD
 	
 		// Construir datos dinámicamente desde $_POST
 		foreach($_POST as $k => $v){
@@ -37,29 +36,10 @@ Class Master extends DBConnection {
 	
 		// Verificar si el proyecto ya existe (por nombre y excluir el actual si se está actualizando)
 		$check = $this->conn->query("SELECT * FROM `project_list` WHERE `title` = '{$title}' ".(is_numeric($id) && $id > 0 ? " AND id != '{$id}'" : "")." ")->num_rows;
-=======
-		foreach($_POST as $k => $v){
-			if(!in_array($k, array('id'))){
-				$v = $this->conn->real_escape_string($v); // Escapar datos
-				if(!empty($data)) $data .= ", ";
-				$data .= " `{$k}` = '{$v}' ";
-			}
-		}
-	
-		if(empty($id)){
-			$sql = "INSERT INTO `project_list` SET {$data}";
-		} else {
-			$sql = "UPDATE `project_list` SET {$data} WHERE id = '{$id}'";
-		}
-	
-		// Validar si el nombre ya existe
-		$check = $this->conn->query("SELECT * FROM `project_list` WHERE `name` = '{$name}' ". (is_numeric($id) && $id > 0 ? "AND id != '{$id}'" : ""))->num_rows;
->>>>>>> 1b45fe63b38a4569f2263a092e494b7082413516
 		if($check > 0){
 			$resp['status'] = 'failed';
 			$resp['msg'] = 'El proyecto ya existe.';
 		} else {
-<<<<<<< HEAD
 			// Crear o actualizar el registro
 			if(empty($id)){
 				$sql = "INSERT INTO `project_list` SET {$data} ";
@@ -108,73 +88,6 @@ Class Master extends DBConnection {
 				$resp['error'] = $this->conn->error;
 			}
 		}
-=======
-			$save = $this->conn->query($sql);
-			if($save){
-				$rid = empty($id) ? $this->conn->insert_id : $id;
-				$resp['id'] = $rid;
-				$resp['status'] = 'success';
-				$resp['msg'] = empty($id) ? "Proyecto agregado exitosamente." : "Proyecto actualizado exitosamente.";
-			} else {
-				$resp['status'] = 'failed';
-				$resp['msg'] = "Ocurrió un error al guardar.";
-				$resp['err'] = $this->conn->error . "[{$sql}]";
-			}
-		}
-	
-		return json_encode($resp);
-	}
-	public function delete_project() {
-		// Verificar si se envió el ID
-		if (!isset($_POST['id']) || !is_numeric($_POST['id'])) {
-			$resp['status'] = 'failed';
-			$resp['msg'] = 'ID de proyecto no válido o no proporcionado.';
-			return json_encode($resp);
-		}
-	
-		$id = intval($_POST['id']); // Asegurar que el ID sea un número entero
-	
-		// Ejecutar consulta para eliminar permanentemente el proyecto
-		$del = $this->conn->query("DELETE FROM `project_list` WHERE id = {$id}");
-	
-		if ($del) {
-			$resp['status'] = 'success';
-			$resp['msg'] = 'Proyecto eliminado permanentemente.';
-		} else {
-			$resp['status'] = 'failed';
-			$resp['msg'] = 'Error al eliminar el proyecto.';
-			$resp['err'] = $this->conn->error; // Incluir el error SQL para depuración
-		}
-	
-		// Devolver respuesta en formato JSON
-		return json_encode($resp);
-	}
-	public function edit_project() {
-		// Validar datos enviados
-		if (!isset($_POST['id']) || !is_numeric($_POST['id'])) {
-			$resp['status'] = 'failed';
-			$resp['msg'] = 'ID de proyecto no válido o no proporcionado.';
-			return json_encode($resp);
-		}
-	
-		$id = intval($_POST['id']);
-		$name = $this->conn->real_escape_string($_POST['name']);
-		$description = $this->conn->real_escape_string($_POST['description']);
-	
-		// Actualizar los datos del proyecto en la base de datos
-		$update = $this->conn->query("UPDATE `project_list` SET name = '{$name}', description = '{$description}' WHERE id = {$id}");
-	
-		if ($update) {
-			$resp['status'] = 'success';
-			$resp['msg'] = 'Proyecto actualizado exitosamente.';
-		} else {
-			$resp['status'] = 'failed';
-			$resp['msg'] = 'No se pudo actualizar el proyecto.';
-			$resp['err'] = $this->conn->error; // Mostrar error SQL para depuración
-		}
-	
-		// Devolver respuesta en formato JSON
->>>>>>> 1b45fe63b38a4569f2263a092e494b7082413516
 		return json_encode($resp);
 	}
 	function close_project(){
@@ -295,38 +208,6 @@ Class Master extends DBConnection {
 		}
 		return json_encode($resp);
 	}
-<<<<<<< HEAD
-=======
-	public function delete_task() {
-		extract($_POST);
-		$delete = $this->conn->query("DELETE FROM `task_list` WHERE id = '{$id}'");
-		if ($delete) {
-			$resp['status'] = 'success';
-		} else {
-			$resp['status'] = 'failed';
-			$resp['msg'] = $this->conn->error;
-		}
-		return json_encode($resp);
-	}
-	public function edit_task() {
-		extract($_POST);
-		$update = $this->conn->query("UPDATE `task_list` SET 
-			project_name = '{$project_name}', 
-			task_name = '{$task_name}', 
-			start_date = '{$start_date}', 
-			end_date = '{$end_date}', 
-			project_status = '{$project_status}', 
-			task_status = '{$task_status}' 
-			WHERE id = '{$id}'");
-		if ($update) {
-			$resp['status'] = 'success';
-		} else {
-			$resp['status'] = 'failed';
-			$resp['msg'] = $this->conn->error;
-		}
-		return json_encode($resp);
-	}
->>>>>>> 1b45fe63b38a4569f2263a092e494b7082413516
 }
 
 $Master = new Master();

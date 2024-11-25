@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 -- phpMyAdmin SQL Dump
 -- version 5.1.1
 -- https://www.phpmyadmin.net/
@@ -7,27 +6,18 @@
 -- Tiempo de generación: 03-02-2022 a las 22:36:03
 -- Versión del servidor: 10.4.21-MariaDB
 -- Versión de PHP: 8.0.11
-=======
--- https://www.phpmyadmin.net/
---
--- Servidor: 127.0.0.1
-
->>>>>>> 1b45fe63b38a4569f2263a092e494b7082413516
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
 SET time_zone = "+00:00";
 
 
-<<<<<<< HEAD
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
 /*!40101 SET NAMES utf8mb4 */;
 
 --
-=======
->>>>>>> 1b45fe63b38a4569f2263a092e494b7082413516
 -- Base de datos: `proyectos`
 --
 
@@ -60,13 +50,9 @@ CREATE TABLE `employee_list` (
 --
 
 INSERT INTO `employee_list` (`id`, `code`, `firstname`, `middlename`, `lastname`, `gender`, `email`, `department`, `position`, `password`, `generated_password`, `status`, `avatar`, `date_created`, `date_updated`) VALUES
-<<<<<<< HEAD
 (2, '2022-0002', 'Eduardo', '', 'Empleado', 'Male', 'eempleado@cweb.com', 'Tecnologías Información', 'Analista QA', '19e36ca1b52bb940291854cd5cd50328', 'j295eq4f', 1, 'uploads/employee-2.png?v=1642972068', '2022-01-12 13:46:11', '2022-01-23 16:07:48'),
 (6, '2022-0005', 'Juan', '', 'Empleado', 'Male', 'jempleado@cweb.com', 'Tecnologías Información', 'Líder de Desarrollo', '84fb4ea96934cc52c6ab2851c38f8a92', 'g9cd0arm', 1, 'uploads/employee-6.png?v=1642970869', '2022-01-23 15:47:49', '2022-01-23 15:51:39'),
 (9, '2022-0006', 'Daniel', '', 'Velasco', 'Male', 'dvelasco@cweb.com', 'Tecnologías Información', 'Líder de Desarrollo', '3b48c801368b940f94101a114cba17d5', 'i5ggrsmf', 1, 'uploads/employee-9.png?v=1643923822', '2022-02-03 16:30:22', '2022-02-03 16:30:22');
-=======
-(1, '2022-2022', 'Jaroly', '', 'Empleado', 'Hombre', 'jobs13az@gmail.com', 'Tecnologías Información', 'Analista QA', '19e36ca1b52bb940291854cd5cd50328', 'jaroly123', 1, 'uploads/employee-2.png?v=1642972068', '2022-01-12 13:46:11', '2022-01-23 16:07:48');
->>>>>>> 1b45fe63b38a4569f2263a092e494b7082413516
 
 -- --------------------------------------------------------
 
@@ -76,16 +62,11 @@ INSERT INTO `employee_list` (`id`, `code`, `firstname`, `middlename`, `lastname`
 
 CREATE TABLE `project_list` (
   `id` int(30) NOT NULL,
-<<<<<<< HEAD
-  `name` text NOT NULL,
-  `description` text NOT NULL,
-=======
   `name` text NOT NULL COMMENT 'Nombre del Proyecto',
   `description` text NOT NULL COMMENT 'Descripción',
   `estimated_start_date` datetime NOT NULL COMMENT 'Fecha Estimada de Inicio',
   `estimated_end_date` datetime NOT NULL COMMENT 'Fecha Estimada de Fin',
   `responsable` text NOT NULL COMMENT 'Responsable',
->>>>>>> 1b45fe63b38a4569f2263a092e494b7082413516
   `status` tinyint(1) NOT NULL DEFAULT 0 COMMENT '0= New, 1= In-Progress, 2= Closed',
   `delete_flag` tinyint(1) NOT NULL DEFAULT 0,
   `date_created` datetime NOT NULL DEFAULT current_timestamp(),
@@ -97,12 +78,8 @@ CREATE TABLE `project_list` (
 --
 
 INSERT INTO `project_list` (`id`, `name`, `description`, `status`, `delete_flag`, `date_created`, `date_updated`) VALUES
-<<<<<<< HEAD
 (6, 'Proyecto Análisis Bases de Datos', 'Proyectos de análisis de información de las bases de datos del departamento de IT de la Empresa AMCORD', 1, 0, '2022-01-23 15:43:14', '2022-01-23 15:53:21'),
 (7, 'Implementar Sistema Gestor de Tareas', 'Se modifica el sistema Gestor de Tareas, se le generan nuevas pantallas.', 1, 0, '2022-02-03 16:27:42', '2022-02-03 16:31:58');
-=======
-(6, 'Proyecto Análisis Bases de Datos', 'Proyectos de análisis de información de las bases de datos del departamento de IT de la Empresa AMCORD', 1, 0, '2022-01-23 15:43:14', '2022-01-23 15:53:21');
->>>>>>> 1b45fe63b38a4569f2263a092e494b7082413516
 
 -- --------------------------------------------------------
 
@@ -128,13 +105,9 @@ CREATE TABLE `report_list` (
 --
 
 INSERT INTO `report_list` (`id`, `project_id`, `employee_id`, `work_type_id`, `description`, `datetime_from`, `datetime_to`, `duration`, `date_created`, `date_updated`) VALUES
-<<<<<<< HEAD
 (8, 6, 6, 5, '&lt;p&gt;Se realizan las validaciones pertinentes de&amp;nbsp;&lt;span style=&quot;font-size: 1rem;&quot;&gt;Recopilaci&oacute;n de informaci&oacute;n, Autenticaci&oacute;n, Denegaci&oacute;n de Servicio, Sesiones, Validaci&oacute;n de Datos, Inspecciones Manuales, Modelamiento de Amenazas.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Pendientes 3 sesiones de pruebas m&aacute;s.&lt;/p&gt;', '2022-01-23 16:00:00', '2022-01-23 17:00:00', 3600, '2022-01-23 16:00:16', NULL),
 (9, 6, 2, 4, '&lt;p&gt;Se valida la calidad de las conexiones de la base de datos principal, la que valida las credenciales de los usuarios con cinco niveles de acceso.&lt;/p&gt;&lt;p&gt;Se coteja la redundancia entre los servidores de seguridad, los tiempos de respuesta son los esperados.&lt;/p&gt;', '2022-01-23 16:00:00', '2022-01-23 17:00:00', 3600, '2022-01-23 16:12:13', NULL),
 (10, 7, 9, 2, '&lt;p&gt;Se realiza la primera reuni&oacute;n del proyecto con el objeto de tomar todos los requerimientos espec&iacute;ficos de los cambios a realizar en la aplicaci&oacute;n.&lt;/p&gt;', '2022-02-04 16:00:00', '2022-02-04 20:00:00', 14400, '2022-02-03 16:31:57', '2022-02-03 16:33:08');
-=======
-(8, 6, 6, 5, '&lt;p&gt;Se realizan las validaciones pertinentes de&amp;nbsp;&lt;span style=&quot;font-size: 1rem;&quot;&gt;Recopilaci&oacute;n de informaci&oacute;n, Autenticaci&oacute;n, Denegaci&oacute;n de Servicio, Sesiones, Validaci&oacute;n de Datos, Inspecciones Manuales, Modelamiento de Amenazas.&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Pendientes 3 sesiones de pruebas m&aacute;s.&lt;/p&gt;', '2022-01-23 16:00:00', '2022-01-23 17:00:00', 3600, '2022-01-23 16:00:16', NULL);
->>>>>>> 1b45fe63b38a4569f2263a092e494b7082413516
 
 -- --------------------------------------------------------
 
@@ -185,12 +158,8 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `firstname`, `middlename`, `lastname`, `username`, `password`, `avatar`, `last_login`, `type`, `status`, `date_added`, `date_updated`) VALUES
-<<<<<<< HEAD
 (1, 'Mauricio', NULL, 'Sevilla', 'configuroweb', '4b67deeb9aba04a5b54632ad19934f26', 'uploads/avatar-1.png?v=1643057611', NULL, 1, 1, '2021-01-20 14:02:37', '2022-01-24 15:53:31'),
 (6, 'Juan', NULL, 'Usuario', 'jusuario', '4b67deeb9aba04a5b54632ad19934f26', 'uploads/avatar-6.png?v=1642971757', NULL, 2, 1, '2022-01-08 16:04:17', '2022-01-23 16:02:37');
-=======
-(1, 'Juan', NULL, 'Polanco', 'JuanPolanco', 'Juan1234', 'uploads/avatar-6.png?v=1642971757', NULL, 2, 1, '2022-01-08 16:04:17', '2022-01-23 16:02:37');
->>>>>>> 1b45fe63b38a4569f2263a092e494b7082413516
 
 -- --------------------------------------------------------
 
@@ -213,7 +182,6 @@ CREATE TABLE `work_type_list` (
 --
 
 INSERT INTO `work_type_list` (`id`, `name`, `description`, `status`, `delete_flag`, `date_created`, `date_updated`) VALUES
-<<<<<<< HEAD
 (1, 'Soporte Técnico', 'El soporte técnico, por lo tanto, es una asistencia que brindan las empresas para que sus clientes puedan hacer uso de sus productos o servicios.', 1, 0, '2022-01-12 11:30:31', '2022-01-23 16:23:38'),
 (2, 'Tecnología', 'La tecnología es el conjunto de conocimientos y técnicas que se aplican de manera ordenada para alcanzar un determinado objetivo o resolver un problema.', 1, 0, '2022-01-12 11:31:53', '2022-01-23 16:26:31'),
 (3, 'Validación Conexiones', 'Definición de consulta de validación, Obligatoria. Manejo de las conexiones con la base de datos, Obligatoria. Configuración del auto-commit, Obligatoria.', 1, 0, '2022-01-12 11:32:15', '2022-01-23 16:21:07'),
@@ -223,9 +191,6 @@ INSERT INTO `work_type_list` (`id`, `name`, `description`, `status`, `delete_fla
 (7, 'Mantenimiento Infraestructura', 'Es la actividad relacionada con la conservación de la infraestructura, maquinaria y equipo, que permite un mejor desempeño de operación del bien y reducción del nivel de riesgo de fallos y/o daños humanos y materiales.', 0, 0, '2022-01-12 11:35:14', '2022-01-23 16:18:57'),
 (8, 'Beta Testing', 'n faucibus posuere sodales. Maecenas euismod, neque id consectetur ullamcorper, nisi erat ultrices urna, sit amet auctor odio magna vitae magna. Suspendisse a diam pellentesque, efficitur lacus eu, facilisis lacus', 1, 1, '2022-01-12 11:35:31', '2022-01-12 11:35:37');
 
-=======
-(1, 'Soporte Técnico', 'El soporte técnico, por lo tanto, es una asistencia que brindan las empresas para que sus clientes puedan hacer uso de sus productos o servicios.', 1, 0, '2022-01-12 11:30:31', '2022-01-23 16:23:38');
->>>>>>> 1b45fe63b38a4569f2263a092e494b7082413516
 --
 -- Índices para tablas volcadas
 --
@@ -242,10 +207,6 @@ ALTER TABLE `employee_list`
 ALTER TABLE `project_list`
   ADD PRIMARY KEY (`id`);
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 1b45fe63b38a4569f2263a092e494b7082413516
 --
 -- Indices de la tabla `report_list`
 --
@@ -313,12 +274,9 @@ ALTER TABLE `users`
 ALTER TABLE `work_type_list`
   MODIFY `id` int(30) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
-<<<<<<< HEAD
 --
 -- Restricciones para tablas volcadas
 --
-=======
->>>>>>> 1b45fe63b38a4569f2263a092e494b7082413516
 
 --
 -- Filtros para la tabla `report_list`
@@ -329,10 +287,6 @@ ALTER TABLE `report_list`
   ADD CONSTRAINT `report_list_ibfk_3` FOREIGN KEY (`employee_id`) REFERENCES `employee_list` (`id`) ON DELETE CASCADE;
 COMMIT;
 
-<<<<<<< HEAD
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-=======
-
->>>>>>> 1b45fe63b38a4569f2263a092e494b7082413516

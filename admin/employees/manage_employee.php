@@ -31,13 +31,8 @@ if(isset($_GET['id'])){
         </div>
         <div class="row">
             <div class="form-group col-md-4">
-<<<<<<< HEAD
-                <input type="text" name="firstname" id="firstname" placeholder="Juan" autofocus required class="form-control form-control-sm form-control-border" value="<?= isset($firstname) ? $firstname :"" ?>">
-                <small class="mx-2">Nombre</small>
-=======
                 <input type="text" name="firstname" id="firstname" placeholder="Primer Nombre" autofocus required class="form-control form-control-sm form-control-border" value="<?= isset($firstname) ? $firstname :"" ?>">
                 <small class="mx-2">Primer Nombre</small>
->>>>>>> 1b45fe63b38a4569f2263a092e494b7082413516
             </div>
             <div class="form-group col-md-4">
                 <input type="text" name="middlename" required id="middlename" placeholder="(opcional)" class="form-control form-control-sm form-control-border" value="<?= isset($middlename) ? $middlename :"" ?>">
