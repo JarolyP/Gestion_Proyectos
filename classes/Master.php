@@ -208,6 +208,45 @@ Class Master extends DBConnection {
 		}
 		return json_encode($resp);
 	}
+	function save_task(){
+		extract($_POST);
+		$data = "";
+		foreach($_POST as $k => $v){
+			if(!in_array($k, array('id'))){
+				if(!is_numeric($v))
+					$v = $this->conn->real_escape_string($v);
+				if(!empty($data)) $data .= ",";
+				$data .= " `{$k}`='{$v}' ";
+			}
+		}
+		if(empty($id)){
+			$sql = "INSERT INTO `task_list` SET {$data}";
+		}else{
+			$sql = "UPDATE `task_list` SET {$data} WHERE id = '{$id}'";
+		}
+		$save = $this->conn->query($sql);
+		if($save){
+			$resp['status'] = 'success';
+			$resp['msg'] = empty($id) ? "Tarea agregada exitosamente." : "Tarea actualizada exitosamente.";
+		}else{
+			$resp['status'] = 'failed';
+			$resp['error'] = $this->conn->error;
+		}
+		return json_encode($resp);
+	}
+	function delete_task(){
+		extract($_POST);
+		$del = $this->conn->query("DELETE FROM `task_list` WHERE id = '{$id}'");
+		if($del){
+			$resp['status'] = 'success';
+			$resp['msg'] = "Tarea eliminada exitosamente.";
+		}else{
+			$resp['status'] = 'failed';
+			$resp['error'] = $this->conn->error;
+		}
+		return json_encode($resp);
+	}
+
 }
 
 $Master = new Master();
@@ -216,6 +255,12 @@ $sysset = new SystemSettings();
 switch ($action) {
 	case 'save_project':
 		echo $Master->save_project();
+	break;
+	case 'save_task':
+		echo $Master->save_task();
+	break;
+	case 'delete_task':
+		echo $Master->delete_task();
 	break;
 	case 'delete_project':
 		echo $Master->delete_project();
