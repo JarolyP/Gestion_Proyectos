@@ -43,68 +43,88 @@
                 <tbody>
                     <?php
                     $i = 1;
-                    $qry = $conn->query("SELECT  p.*, CONCAT(e.firstname, ' ', e.lastname) as responsible_name FROM `project_list` p JOIN `employee_list` e ON p.responsible = e.id WHERE p.delete_flag = 0 ORDER BY p.title ASC");
 
-                    while ($row = $qry->fetch_assoc()): // Asegúrate de usar fetch_assoc para recorrer los datos
-                    ?>
-                        <tr>
-                            <td class="text-center"><?php echo $i++; ?></td>
-                            <td class=""><?php echo date("Y-m-d H:i", strtotime($row['date_created'])) ?></td>
-                            <td class="">
-                                <p class="m-0 truncate-1"><?php echo $row['title'] ?></p>
-                            </td>
-                            <td class=""><?php echo $row['start_date'] ? date("Y-m-d", strtotime($row['start_date'])) : 'No definida'; ?></td>
-                            <td class=""><?php echo $row['end_date'] ? date("Y-m-d", strtotime($row['end_date'])) : 'No definida'; ?></td>
-                            <td class="">
-                                <p class="m-0 truncate-1"><?php echo $row['responsible_name'] ?></p>
-                            </td>
-                            <td class="text-center">
-                                <?php
-                                switch ($row['status']) {
-                                    case 'Nuevo':
-                                        echo '<span class="rounded-pill badge badge-success bg-gradient-teal px-3">Nuevo</span>';
-                                        break;
-                                    case 'En Proceso':
-                                        echo '<span class="rounded-pill badge badge-primary bg-gradient-primary px-3">En Proceso</span>';
-                                        break;
-                                    case 'Cancelado':
-                                        echo '<span class="rounded-pill badge badge-danger bg-gradient-danger px-3">Cancelado</span>';
-                                        break;
-                                    case 'Terminado':
-                                        echo '<span class="rounded-pill badge badge-success bg-gradient-green px-3">Terminado</span>';
-                                        break;
-                                    case 'Pendiente':
-                                        echo '<span class="rounded-pill badge badge-warning bg-gradient-warning px-3">Pendiente</span>';
-                                        break;
-                                    case 'Cerrado':
-                                        echo '<span class="rounded-pill badge badge-dark bg-gradient-dark px-3 text-light">Cerrado</span>';
-                                        break;
-                                }
-                                ?>
-                            </td>
-                            <td align="center">
-                                <button type="button" class="btn btn-flat btn-default btn-sm dropdown-toggle dropdown-icon" data-toggle="dropdown">
-                                    Acción
-                                    <span class="sr-only">Toggle Dropdown</span>
-                                </button>
-                                <div class="dropdown-menu" role="menu">
-                                    <a class="dropdown-item" href="./?page=projects/view_project&id=<?= $row['id'] ?>" data-id="<?php echo $row['id'] ?>">
-                                        <span class="fa fa-eye text-dark"></span> Ver
-                                    </a>
-                                    <?php if ($row['status'] != 'Cerrado'): ?>
-                                        <div class="dropdown-divider"></div>
-                                        <a class="dropdown-item edit_data" href="javascript:void(0)" data-id="<?php echo $row['id'] ?>">
-                                            <span class="fa fa-edit text-primary"></span> Editar
+                    // Verificar conexión y ejecutar consulta
+                    if (!$conn) {
+                        die("Conexión fallida: " . mysqli_connect_error());
+                    }
+
+                    // Realizar la consulta para obtener los proyectos y los responsables (usuarios tipo 2)
+                    $qry = $conn->query("
+                        SELECT 
+                            p.*, 
+                            CONCAT(u.firstname, ' ', u.lastname) as responsible_name 
+                        FROM 
+                            `project_list` p 
+                        LEFT JOIN 
+                            `users` u 
+                        ON 
+                            p.responsible = u.id 
+                        WHERE 
+                            p.delete_flag = 0 
+                            AND u.type = 2  -- Filtrar solo usuarios de tipo 2 (staff)
+                        ORDER BY 
+                            p.title ASC
+                    ");
+
+                    // Comprobar si la consulta fue exitosa antes de intentar acceder a la variable $qry
+                    if (!$qry) {
+                        echo "<tr><td colspan='8' class='text-center'>Error en la consulta: " . $conn->error . "</td></tr>";
+                    } else {
+                        // Si la consulta fue exitosa, iteramos sobre los resultados
+                        while ($row = $qry->fetch_assoc()): ?>
+                            <tr>
+                                <td class="text-center"><?php echo $i++; ?></td>
+                                <td class=""><?php echo date("Y-m-d H:i", strtotime($row['date_created'])); ?></td>
+                                <td class=""><?php echo htmlspecialchars($row['title']); ?></td>
+                                <td class=""><?php echo $row['start_date'] ? date("Y-m-d", strtotime($row['start_date'])) : 'No definida'; ?></td>
+                                <td class=""><?php echo $row['end_date'] ? date("Y-m-d", strtotime($row['end_date'])) : 'No definida'; ?></td>
+                                <td class=""><?php echo htmlspecialchars($row['responsible_name']) ? $row['responsible_name'] : 'Sin Responsable'; ?></td>
+                                <td class="text-center">
+                                    <?php
+                                    switch ($row['status']) {
+                                        case 'Nuevo':
+                                            echo '<span class="rounded-pill badge badge-success bg-gradient-teal px-3">Nuevo</span>';
+                                            break;
+                                        case 'En Proceso':
+                                            echo '<span class="rounded-pill badge badge-primary bg-gradient-primary px-3">En Proceso</span>';
+                                            break;
+                                        case 'Cancelado':
+                                            echo '<span class="rounded-pill badge badge-danger bg-gradient-danger px-3">Cancelado</span>';
+                                            break;
+                                        case 'Terminado':
+                                            echo '<span class="rounded-pill badge badge-success bg-gradient-green px-3">Terminado</span>';
+                                            break;
+                                        case 'En Planificación':
+                                            echo '<span class="rounded-pill badge badge-dark bg-gradient-dark px-3 text-light">En Planificación</span>';
+                                            break;
+                                    }
+                                    ?>
+                                </td>
+                                <td align="center">
+                                    <button type="button" class="btn btn-flat btn-default btn-sm dropdown-toggle dropdown-icon" data-toggle="dropdown">
+                                        Acción
+                                        <span class="sr-only">Toggle Dropdown</span>
+                                    </button>
+                                    <div class="dropdown-menu" role="menu">
+                                        <a class="dropdown-item" href="./?page=projects/view_project&id=<?= $row['id'] ?>" data-id="<?php echo $row['id'] ?>">
+                                            <span class="fa fa-eye text-dark"></span> Ver
                                         </a>
-                                        <div class="dropdown-divider"></div>
-                                        <a class="dropdown-item delete_data" href="javascript:void(0)" data-id="<?php echo $row['id'] ?>">
-                                            <span class="fa fa-trash text-danger"></span> Eliminar
-                                        </a>
-                                    <?php endif; ?>
-                                </div>
-                            </td>
-                        </tr>
-                    <?php endwhile; ?>
+                                        <?php if ($row['status'] != 'Cerrado'): ?>
+                                            <div class="dropdown-divider"></div>
+                                            <a class="dropdown-item edit_data" href="javascript:void(0)" data-id="<?php echo $row['id'] ?>">
+                                                <span class="fa fa-edit text-primary"></span> Editar
+                                            </a>
+                                            <div class="dropdown-divider"></div>
+                                            <a class="dropdown-item delete_data" href="javascript:void(0)" data-id="<?php echo $row['id'] ?>">
+                                                <span class="fa fa-trash text-danger"></span> Eliminar
+                                            </a>
+                                        <?php endif; ?>
+                                    </div>
+                                </td>
+                            </tr>
+                        <?php endwhile; ?>
+                    <?php } ?>
                 </tbody>
             </table>
         </div>

@@ -50,10 +50,10 @@ function duration($dur = 0){
                                             echo '<span class="rounded-pill badge badge-success bg-gradient-teal px-3">Nuevo</span>';
                                             break;
                                         case 1:
-                                            echo '<span class="rounded-pill badge badge-primary bg-gradient-primary px-3">En-curso</span>';
+                                            echo '<span class="rounded-pill badge badge-primary bg-gradient-primary px-3">En-Proceso</span>';
                                             break;
                                         case 2:
-                                            echo '<span class="rounded-pill badge badge-dark bg-gradient-dark px-3 text-light">Cerrado</span>';
+                                            echo '<span class="rounded-pill badge badge-dark bg-gradient-dark px-3 text-light">Cancelado</span>';
                                             break;
                                     }
                                 ?>
@@ -131,7 +131,7 @@ function duration($dur = 0){
 			_conf("¿Estás segur@ de eliminar este proyecto?","delete_project",["<?= isset($id) ? $id : '' ?>"])
 		})
         $('#close_project').click(function(){
-			_conf("¿Estás segur@ de cerrar este proyecto?","close_project",["<?= isset($id) ? $id : '' ?>"])
+			_conf("¿Estás segur@ de Cancelar este proyecto?","close_project",["<?= isset($id) ? $id : '' ?>"])
 		})
         $('.view_data').click(function(){
 			uni_modal("Detalles del informe","projects/view_report.php?id="+$(this).attr('data-id'),"mid-large")

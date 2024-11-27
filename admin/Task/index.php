@@ -5,6 +5,7 @@
         object-fit: scale-down;
         object-position: center center;
     }
+
     .progress-bar {
         transition: width 0.4s ease;
     }
@@ -44,55 +45,64 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <?php 
-                        $i = 1;
-                        $qry = $conn->query("SELECT t.*, 
+                    <?php
+                    $i = 1;
+                    $qry = $conn->query("SELECT t.*, 
                                 (SELECT IFNULL(AVG(tk.progress), 0) 
                                  FROM task_list tk 
                                  WHERE tk.project_id = t.project_id) AS progress
                             FROM task_list t
                             WHERE t.status != 'Cancelada'
                             ORDER BY t.date_created DESC");
-                        while ($row = $qry->fetch_assoc()):
-                            $progress = round($row['progress']);
+                    while ($row = $qry->fetch_assoc()):
+                        $progress = round($row['progress']);
                     ?>
-                    <tr>
-                        <td class="text-center"><?php echo $i++; ?></td>
-                        <td><?php echo date("Y-m-d H:i", strtotime($row['date_created'])) ?></td>
-                        <td><p class="m-0 truncate-1"><?php echo $row['task'] ?></p></td>
-                        <td><?php echo $row['estimated_start_date'] ? date("Y-m-d", strtotime($row['estimated_start_date'])) : 'No definida'; ?></td>
-                        <td><?php echo $row['estimated_end_date'] ? date("Y-m-d", strtotime($row['estimated_end_date'])) : 'No definida'; ?></td>
-                        <td><p class="m-0 truncate-1"><?php echo $row['responsible'] ?></p></td>
-                        <td class="align-middle">
-                            <div class="progress progress-sm">
-                                <div class="progress-bar bg-green" role="progressbar" aria-valuenow="<?php echo $progress ?>" 
-                                     aria-valuemin="0" aria-valuemax="100" style="width: <?php echo $progress ?>%">
+                        <tr>
+                            <td class="text-center"><?php echo $i++; ?></td>
+                            <td><?php echo date("Y-m-d H:i", strtotime($row['date_created'])) ?></td>
+                            <td>
+                                <p class="m-0 truncate-1"><?php echo $row['task'] ?></p>
+                            </td>
+                            <td><?php echo $row['estimated_start_date'] ? date("Y-m-d", strtotime($row['estimated_start_date'])) : 'No definida'; ?></td>
+                            <td><?php echo $row['estimated_end_date'] ? date("Y-m-d", strtotime($row['estimated_end_date'])) : 'No definida'; ?></td>
+                            <td>
+                                <p class="m-0 truncate-1"><?php echo $row['responsible'] ?></p>
+                            </td>
+                            <td class="align-middle">
+                                <div class="progress">
+                                    <div class="progress-bar" role="progressbar" style="width: <?php echo $task['progress']; ?>%;" aria-valuenow="<?php echo $task['progress']; ?>" aria-valuemin="0" aria-valuemax="100">
+                                        <?php echo round($task['progress']); ?>%
+                                    </div>
                                 </div>
-                            </div>
-                            <small><?php echo $progress ?>% Completado</small>
-                        </td>
-                        <td align="center">
-                            <button type="button" class="btn btn-flat btn-default btn-sm dropdown-toggle dropdown-icon" data-toggle="dropdown">
-                                Acción
-                                <span class="sr-only">Toggle Dropdown</span>
-                            </button>
-                            <div class="dropdown-menu" role="menu">
-                                <a class="dropdown-item" href="./?page=Task/view_task&id=<?= $row['id'] ?>" data-id="<?php echo $row['id'] ?>">
-                                    <span class="fa fa-eye text-dark"></span> Ver
-                                </a>
-                                <?php if ($row['status'] != 'Completada' && $row['status'] != 'Cancelada'): ?>
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item edit_data" href="javascript:void(0)" data-id="<?php echo $row['id'] ?>">
-                                    <span class="fa fa-edit text-primary"></span> Editar
-                                </a>
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item delete_data" href="javascript:void(0)" data-id="<?php echo $row['id'] ?>">
-                                    <span class="fa fa-trash text-danger"></span> Eliminar
-                                </a>
-                                <?php endif; ?>
-                            </div>
-                        </td>
-                    </tr>
+                                <div class="progress progress-sm">
+                                    <div class="progress-bar bg-green" role="progressbar" aria-valuenow="<?php echo $progress ?>"
+                                        aria-valuemin="0" aria-valuemax="100" style="width: <?php echo $progress ?>%">
+                                    </div>
+                                </div>
+                                <small><?php echo $progress ?>% Completado</small>
+                            </td>
+                            <td align="center">
+                                <button type="button" class="btn btn-flat btn-default btn-sm dropdown-toggle dropdown-icon" data-toggle="dropdown">
+                                    Acción
+                                    <span class="sr-only">Toggle Dropdown</span>
+                                </button>
+                                <div class="dropdown-menu" role="menu">
+                                    <a class="dropdown-item" href="./?page=Task/view_task&id=<?= $row['id'] ?>" data-id="<?php echo $row['id'] ?>">
+                                        <span class="fa fa-eye text-dark"></span> Ver
+                                    </a>
+                                    <?php if ($row['status'] != 'Completada' && $row['status'] != 'Cancelada'): ?>
+                                        <div class="dropdown-divider"></div>
+                                        <a class="dropdown-item edit_data" href="javascript:void(0)" data-id="<?php echo $row['id'] ?>">
+                                            <span class="fa fa-edit text-primary"></span> Editar
+                                        </a>
+                                        <div class="dropdown-divider"></div>
+                                        <a class="dropdown-item delete_data" href="javascript:void(0)" data-id="<?php echo $row['id'] ?>">
+                                            <span class="fa fa-trash text-danger"></span> Eliminar
+                                        </a>
+                                    <?php endif; ?>
+                                </div>
+                            </td>
+                        </tr>
                     <?php endwhile; ?>
                 </tbody>
             </table>
@@ -100,21 +110,24 @@
     </div>
 </div>
 <script>
-    $(document).ready(function(){
-        $('#create_new').click(function(){
+    $(document).ready(function() {
+        $('#create_new').click(function() {
             uni_modal("Agregar Nueva Tarea", "Task/manage_task.php");
         });
-        $('.view_data').click(function(){
+        $('.view_data').click(function() {
             uni_modal("Información de la Tarea", "Task/view_task.php?id=" + $(this).attr('data-id'));
         });
-        $('.edit_data').click(function(){
+        $('.edit_data').click(function() {
             uni_modal("Actualizar Información de la Tarea", "Task/manage_task.php?id=" + $(this).attr('data-id'));
         });
-        $('.delete_data').click(function(){
+        $('.delete_data').click(function() {
             _conf("¿Estás segur@ de eliminar esta tarea de forma permanente?", "delete_task", [$(this).attr('data-id')]);
         });
         $('.table').dataTable({
-            columnDefs: [{ orderable: false, targets: [6, 7] }],  // Disable sorting on progress and action columns
+            columnDefs: [{
+                orderable: false,
+                targets: [6, 7]
+            }], // Disable sorting on progress and action columns
         });
     });
 
@@ -123,7 +136,9 @@
         $.ajax({
             url: _base_url_ + "classes/Master.php?f=delete_task",
             method: "POST",
-            data: {id: $id},
+            data: {
+                id: $id
+            },
             dataType: "json",
             error: err => {
                 console.log(err);

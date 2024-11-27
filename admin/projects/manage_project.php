@@ -33,46 +33,146 @@ if (isset($_GET['id'])) {
         </div>
 
         <div class="form-group">
+            <label for="responsible" class="control-label">Responsable del Proyecto</label>
+            <select name="responsible" id="responsible" class="form-control form-control-border" required>
+                <option value="">Selecciona un responsable</option>
+                <?php
+                // Obtener los usuarios de la tabla 'users' que son staff (type = 2) y están activos (status = 1)
+                $staff_query = $conn->query("SELECT id, firstname, lastname FROM users WHERE type = 2 AND status = 1");
+                while ($staff = $staff_query->fetch_array()):
+                ?>
+                    <option value="<?php echo $staff['id']; ?>" <?php echo (isset($responsible) && $responsible == $staff['id']) ? 'selected' : '' ?>>
+                        <?php echo $staff['firstname'] . ' ' . $staff['lastname']; ?>
+                    </option>
+                <?php endwhile; ?>
+            </select>
+        </div>
+
+        <div class="form-group">
             <label for="start_date" class="control-label">Fecha Estimada de Inicio</label>
-            <input type="date" name="start_date" id="start_date" class="form-control form-control-border" value="<?php echo isset($start_date) ? $start_date : '' ?>">
+            <input type="date" name="start_date" id="start_date" class="form-control form-control-border"
+                value="<?php echo isset($start_date) ? $start_date : '' ?>" onchange="toggleRealDates2(); validateEndDate(); updateStatus();">
         </div>
 
         <div class="form-group">
             <label for="end_date" class="control-label">Fecha Estimada de Fin</label>
-            <input type="date" name="end_date" id="end_date" class="form-control form-control-border" value="<?php echo isset($end_date) ? $end_date : '' ?>">
+            <input type="date" name="end_date" id="end_date" class="form-control form-control-border"
+                value="<?php echo isset($end_date) ? $end_date : '' ?>" onchange="toggleRealDates2(); validateEndDate();  updateStatus();">
         </div>
 
         <div class="form-group">
-    <label for="responsible" class="control-label">Responsable del Proyecto</label>
-    <select name="responsible" id="responsible" class="form-control form-control-border" required>
-        <option value="">Selecciona un responsable</option>
-        <?php 
-            // Obtener los empleados de la tabla 'employee_list'
-            $staff_query = $conn->query("SELECT id, firstname, lastname FROM employee_list WHERE status = 1");
-            while($staff = $staff_query->fetch_array()):
-        ?>
-            <option value="<?php echo $staff['id']; ?>" <?php echo (isset($responsible) && $responsible == $staff['id']) ? 'selected' : '' ?>>
-                <?php echo $staff['firstname'] . ' ' . $staff['lastname']; ?>
-            </option>
-        <?php endwhile; ?>
-    </select>
-</div>
+            <label for="start_date_real" class="control-label">Fecha de Inicio Real</label>
+            <input type="date" name="start_date_real" id="start_date_real" class="form-control form-control-border"
+                value="<?php echo isset($start_date_real) ? $start_date_real : '' ?>" onchange="toggleRealDates1(); validateRealDates(); updateStatus();">
+        </div>
 
+        <div class="form-group">
+            <label for="end_date_real" class="control-label">Fecha de Fin Real</label>
+            <input type="date" name="end_date_real" id="end_date_real" class="form-control form-control-border"
+                value="<?php echo isset($end_date_real) ? $end_date_real : '' ?>" onchange="toggleRealDates1(); validateRealDates(); updateStatus(); ">
+        </div>
 
         <div class="form-group">
             <label for="status" class="control-label">Estado</label>
-            <select name="status" id="status" class="form-control form-control-border" required>
-                <option value="Nuevo" <?php echo (isset($status) && $status == 'Nuevo') ? 'selected' : '' ?>>Nuevo</option>
-                <option value="En Proceso" <?php echo (isset($status) && $status == 'En Proceso') ? 'selected' : '' ?>>En Proceso</option>
-                <option value="Cancelado" <?php echo (isset($status) && $status == 'Cancelado') ? 'selected' : '' ?>>Cancelado</option>
-                <option value="Terminado" <?php echo (isset($status) && $status == 'Terminado') ? 'selected' : '' ?>>Terminado</option>
-                <option value="En Planificación" <?php echo (isset($status) && $status == 'En Planificación') ? 'selected' : '' ?>>En Planificación</option>
-            </select>
+            <input type="text" name="status" id="status_text" class="form-control form-control-border" placeholder="Estado" value="<?php echo isset($status) ? $status : 'Estado'; ?>" readonly>
         </div>
     </form>
 </div>
 
 <script>
+    function updateStatus() {
+        const startDate = document.getElementById('start_date').value;
+        const endDate = document.getElementById('end_date').value;
+        const status = document.getElementById('status_text'); // Cambiado a status_text
+
+        // Si ambas fechas estimadas son seleccionadas, cambia el estado a 'Nuevo'
+        if (startDate && endDate) {
+            status.value = "En Planificación"; // Estado "Nuevo" si ambas fechas están completas
+        } else {
+            status.value = "Nuevo"; // Estado "En Planificación" si alguna fecha falta
+        }
+    }
+
+    function toggleRealDates2() {
+        const startDateEstimated = document.getElementById('start_date').value;
+        const endDateEstimated = document.getElementById('end_date').value;
+
+        const startDateReal = document.getElementById('start_date_real');
+        const endDateReal = document.getElementById('end_date_real');
+
+        // Si se ha seleccionado una fecha estimada de inicio o fin, deshabilitamos las fechas reales
+        if (startDateEstimated || endDateEstimated) {
+            startDateReal.disabled = true;
+            endDateReal.disabled = true;
+        } else {
+            startDateReal.disabled = false;
+            endDateReal.disabled = false;
+        }
+    }
+
+    function toggleRealDates1() {
+        const startDateEstimated = document.getElementById('start_date');
+        const endDateEstimated = document.getElementById('end_date');
+
+        const startDateReal = document.getElementById('start_date_real').value;
+        const endDateReal = document.getElementById('end_date_real').value;
+
+        // Si se ha seleccionado una fecha estimada de inicio o fin, deshabilitamos las fechas reales
+        if (startDateReal || endDateReal) {
+            startDateEstimated.disabled = true;
+            endDateEstimated.disabled = true;
+        } else {
+            startDateEstimated.disabled = false;
+            endDateEstimated.disabled = false;
+        }
+    }
+
+    function updateStatus1() {
+        const startDate = document.getElementById('start_date').value;
+        const endDate = document.getElementById('end_date').value;
+        const status = document.getElementById('status');
+
+        // Si ambas fechas reales son seleccionadas, cambia el estado a 'Nuevo'
+        if (startDate && endDate) {
+            status.value = "Nuevo";
+        }
+    }
+
+    function updateStatus2() {
+        const startDate = document.getElementById('start_date').value;
+        const endDate = document.getElementById('end_date').value;
+        const status = document.getElementById('status');
+
+        if (startDate && endDate) {
+            status.value = "En Planificación";
+        } else {
+            status.value = "Nuevo";
+        }
+    }
+
+    function validateRealDates() {
+        const startDateReal = document.getElementById('start_date_real').value;
+        const endDateReal = document.getElementById('end_date_real').value;
+
+        if (startDateReal && endDateReal) {
+            if (new Date(endDateReal) < new Date(startDateReal)) {
+                alert('La fecha de fin real no puede ser menor que la fecha de inicio real.');
+                document.getElementById('end_date_real').value = ''; // Restablece el campo de fecha de fin real
+            }
+        }
+    }
+    // Valida que la fecha de fin no sea menor a la de inicio
+    function validateEndDate() {
+        const startDate = document.getElementById('start_date').value;
+        const endDate = document.getElementById('end_date').value;
+
+        if (startDate && endDate) {
+            if (new Date(endDate) < new Date(startDate)) {
+                alert('La fecha de fin no puede ser menor que la fecha de inicio.');
+                document.getElementById('end_date').value = ''; // Restablece el campo de fecha de fin
+            }
+        }
+    }
     $(function() {
         $('#uni_modal #project-form').submit(function(e) {
             e.preventDefault(); // Prevenir el comportamiento predeterminado del formulario

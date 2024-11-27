@@ -81,7 +81,7 @@
                         </a>
                       </li>
                       <li class="nav-item dropdown">
-                        <a href="<?php echo base_url ?>admin/?page=reports/by_task" class="nav-link nav-reports_date_wise">
+                        <a href="<?php echo base_url ?>admin/?page=reports/by_task" class="nav-link nav-reports_by_employee">
                           <i class="nav-icon fas fa-circle"></i>
                           <p>
                          Reporte Tiempo Tarea

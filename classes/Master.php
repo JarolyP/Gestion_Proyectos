@@ -1,313 +1,394 @@
 <?php
 require_once('../config.php');
-Class Master extends DBConnection {
+class Master extends DBConnection
+{
 	private $settings;
-	public function __construct(){
+	public function __construct()
+	{
 		global $_settings;
 		$this->settings = $_settings;
 		parent::__construct();
 	}
-	public function __destruct(){
+	public function __destruct()
+	{
 		parent::__destruct();
 	}
-	function capture_err(){
-		if(!$this->conn->error)
+	function capture_err()
+	{
+		if (!$this->conn->error)
 			return false;
-		else{
+		else {
 			$resp['status'] = 'failed';
 			$resp['error'] = $this->conn->error;
 			return json_encode($resp);
 			exit;
 		}
 	}
-	function save_project(){
-    extract($_POST);
-    $data = "";
+	function save_project()
+	{
+		extract($_POST);
+		$data = "";
 
-    // Depuración: Verificar los datos recibidos
-    error_log(print_r($_POST, true)); // Log de los datos recibidos
+		// Depuración: Verificar los datos recibidos
+		error_log(print_r($_POST, true)); // Log de los datos recibidos
 
-    foreach($_POST as $k => $v){
-        if(!in_array($k, array('id'))){
-            if(!is_numeric($v))
-                $v = $this->conn->real_escape_string($v); // Escape de los valores
-            if(!empty($data)) $data .= ",";
-            $data .= " `{$k}`='{$v}' ";
-        }
-    }
+		// Verificar que las fechas y el estado estén presentes
+		if (!isset($start_date) || !isset($end_date) || !isset($status)) {
+			$resp['status'] = 'failed';
+			$resp['msg'] = 'Las fechas y el estado son obligatorios.';
+			return json_encode($resp);
+		}
 
-    // Verificar si el proyecto ya existe
-    $check = $this->conn->query("SELECT * FROM `project_list` WHERE `title` = '{$title}' ".(is_numeric($id) && $id > 0 ? " AND id != '{$id}'" : "")." ")->num_rows;
-    if($check > 0){
-        $resp['status'] = 'failed';
-        $resp['msg'] = 'El proyecto ya existe.';
-    } else {
-        // Crear o actualizar el registro
-        if(empty($id)){
-            $sql = "INSERT INTO `project_list` SET {$data}";
-        } else {
-            $sql = "UPDATE `project_list` SET {$data} WHERE id = '{$id}'";
-        }
+		foreach ($_POST as $k => $v) {
+			if (!in_array($k, array('id'))) {
+				if (!is_numeric($v))
+					$v = $this->conn->real_escape_string($v); // Escape de los valores
+				if (!empty($data)) $data .= ",";
+				$data .= " `{$k}`='{$v}' ";
+			}
+		}
 
-        // Depuración: Verifica la consulta SQL
-        error_log("Consulta SQL: " . $sql);
+		// Verificar si el proyecto ya existe
+		$check = $this->conn->query("SELECT * FROM `project_list` WHERE `title` = '{$title}' " . (is_numeric($id) && $id > 0 ? " AND id != '{$id}'" : "") . " ")->num_rows;
+		if ($check > 0) {
+			$resp['status'] = 'failed';
+			$resp['msg'] = 'El proyecto ya existe.';
+		} else {
+			// Crear o actualizar el registro
+			if (empty($id)) {
+				// Agregar el nuevo proyecto, incluyendo las fechas reales y estado
+				$sql = "INSERT INTO `project_list` SET {$data}";
+			} else {
+				// Actualizar el proyecto, incluyendo las fechas reales y estado
+				$sql = "UPDATE `project_list` SET {$data} WHERE id = '{$id}'";
+			}
 
-        // Ejecutar la consulta
-        $save = $this->conn->query($sql);
-        if($save){
-            $rid = !empty($id) ? $id : $this->conn->insert_id; // Obtener ID generado si es nuevo
-            $resp['id'] = $rid;
-            $resp['status'] = 'success';
-            $resp['msg'] = empty($id) ? "Proyecto agregado exitosamente." : "Proyecto actualizado exitosamente.";
-        } else {
-            // Si ocurre un error, mostrar detalles del error
-            $resp['status'] = 'failed';
-            $resp['msg'] = "Ocurrió un error al guardar los datos.";
-            $resp['error'] = $this->conn->error;  // Detalles del error de la consulta
-        }
-    }
+			// Depuración: Verifica la consulta SQL
+			error_log("Consulta SQL: " . $sql);
 
-    // Agregar mensaje flash si se guarda correctamente
-    if($resp['status'] == 'success')
-        $this->settings->set_flashdata('success', $resp['msg']);
+			// Ejecutar la consulta
+			$save = $this->conn->query($sql);
+			if ($save) {
+				$rid = !empty($id) ? $id : $this->conn->insert_id; // Obtener ID generado si es nuevo
+				$resp['id'] = $rid;
+				$resp['status'] = 'success';
+				$resp['msg'] = empty($id) ? "Proyecto agregado exitosamente." : "Proyecto actualizado exitosamente.";
+			} else {
+				// Si ocurre un error, mostrar detalles del error
+				$resp['status'] = 'failed';
+				$resp['msg'] = "Ocurrió un error al guardar los datos.";
+				$resp['error'] = $this->conn->error;  // Detalles del error de la consulta
+			}
+		}
 
-    return json_encode($resp); // Devolver respuesta en formato JSON
-}
+		// Agregar mensaje flash si se guarda correctamente
+		if ($resp['status'] == 'success')
+			$this->settings->set_flashdata('success', $resp['msg']);
 
-	
-	function delete_project(){
+		return json_encode($resp); // Devolver respuesta en formato JSON
+	}
+
+
+	function delete_project()
+	{
 		extract($_POST);
 		$check = $this->conn->query("SELECT * FROM `report_list` where project_id ='{$id}'")->num_rows;
-		if($check > 0){
+		if ($check > 0) {
 			$resp['status'] = 'failed';
 			$resp['mesg'] = 'No se puede eliminar este proyecto porque ya tiene un informe listado.';
-		}else{
+		} else {
 			$del = $this->conn->query("UPDATE `project_list` set delete_flag = 1 where id = '{$id}'");
-			if($del){
+			if ($del) {
 				$resp['status'] = 'success';
-				$this->settings->set_flashdata('success',"Proyect ha sido eliminado exitósamente.");
-			}else{
+				$this->settings->set_flashdata('success', "Proyect ha sido eliminado exitósamente.");
+			} else {
 				$resp['status'] = 'failed';
 				$resp['error'] = $this->conn->error;
 			}
 		}
 		return json_encode($resp);
 	}
-	function close_project(){
+	function close_project()
+	{
 		extract($_POST);
-		
+
 		$update = $this->conn->query("UPDATE `project_list` set status = 2 where id = '{$id}'");
-		if($update){
+		if ($update) {
 			$resp['status'] = 'success';
-			$this->settings->set_flashdata('success',"Proyecto ha sido cerrado exitósamente.");
-		}else{
+			$this->settings->set_flashdata('success', "Proyecto ha sido cerrado exitósamente.");
+		} else {
 			$resp['status'] = 'failed';
 			$resp['error'] = $this->conn->error;
 		}
 		return json_encode($resp);
 	}
-	function save_work_type(){
+	function save_work_type()
+	{
 		extract($_POST);
 		$data = "";
-		foreach($_POST as $k =>$v){
-			if(!in_array($k,array('id'))){
-				if(!is_numeric($v))
+		foreach ($_POST as $k => $v) {
+			if (!in_array($k, array('id'))) {
+				if (!is_numeric($v))
 					$v = $this->conn->real_escape_string($v);
-				if(!empty($data)) $data .=",";
+				if (!empty($data)) $data .= ",";
 				$data .= " `{$k}`='{$v}' ";
 			}
 		}
-		if(empty($id)){
+		if (empty($id)) {
 			$sql = "INSERT INTO `work_type_list` set {$data} ";
-		}else{
+		} else {
 			$sql = "UPDATE `work_type_list` set {$data} where id = '{$id}' ";
 		}
-		$check = $this->conn->query("SELECT * FROM `work_type_list` where `name` = '{$name}' ".(is_numeric($id) && $id > 0 ? " and id != '{$id}'" : "")." ")->num_rows;
-		if($check > 0){
+		$check = $this->conn->query("SELECT * FROM `work_type_list` where `name` = '{$name}' " . (is_numeric($id) && $id > 0 ? " and id != '{$id}'" : "") . " ")->num_rows;
+		if ($check > 0) {
 			$resp['status'] = 'failed';
 			$resp['msg'] = 'Este tipo de trabajo ya existe';
-			
-		}else{
+		} else {
 			$save = $this->conn->query($sql);
-			if($save){
+			if ($save) {
 				$rid = !empty($id) ? $id : $this->conn->insert_id;
 				$resp['id'] = $rid;
 				$resp['status'] = 'success';
-				if(empty($id))
+				if (empty($id))
 					$resp['msg'] = "Este tipo de trabajo ha sido agregado exitósamente";
 				else
 					$resp['msg'] = "La información de este tipo de trabajo ha sido actualizada exitósamente";
-			}else{
+			} else {
 				$resp['status'] = 'failed';
 				$resp['msg'] = "Ocurrió un error.";
-				$resp['err'] = $this->conn->error."[{$sql}]";
+				$resp['err'] = $this->conn->error . "[{$sql}]";
 			}
 		}
-		if($resp['status'] =='success')
-			$this->settings->set_flashdata('success',$resp['msg']);
+		if ($resp['status'] == 'success')
+			$this->settings->set_flashdata('success', $resp['msg']);
 		return json_encode($resp);
 	}
-	function delete_work_type(){
+	function delete_work_type()
+	{
 		extract($_POST);
 		$del = $this->conn->query("UPDATE `work_type_list` set delete_flag = 1 where id = '{$id}'");
-		if($del){
+		if ($del) {
 			$resp['status'] = 'success';
-			$this->settings->set_flashdata('success',"Este tipo de trabajo ha sido eliminado exitósamente.");
-		}else{
+			$this->settings->set_flashdata('success', "Este tipo de trabajo ha sido eliminado exitósamente.");
+		} else {
 			$resp['status'] = 'failed';
 			$resp['error'] = $this->conn->error;
 		}
 		return json_encode($resp);
 	}
-	function save_report(){
+	function save_report()
+	{
 		$_POST['description'] = htmlentities($_POST['description']);
 		$_POST['employee_id'] = $this->settings->userdata('id');
 		$duration = strtotime($_POST['datetime_to']) - strtotime($_POST['datetime_from']);
 		$_POST['duration'] = $duration;
 		extract($_POST);
 		$data = "";
-		foreach($_POST as $k =>$v){
-			if(!in_array($k,array('id'))){
-				if(!is_numeric($v))
+		foreach ($_POST as $k => $v) {
+			if (!in_array($k, array('id'))) {
+				if (!is_numeric($v))
 					$v = $this->conn->real_escape_string($v);
-				if(!empty($data)) $data .=",";
+				if (!empty($data)) $data .= ",";
 				$data .= " `{$k}`='{$v}' ";
 			}
 		}
-		if(empty($id)){
+		if (empty($id)) {
 			$sql = "INSERT INTO `report_list` set {$data} ";
-		}else{
+		} else {
 			$sql = "UPDATE `report_list` set {$data} where id = '{$id}' ";
 		}
 		$save = $this->conn->query($sql);
-		if($save){
+		if ($save) {
 			$rid = !empty($id) ? $id : $this->conn->insert_id;
 			$resp['id'] = $rid;
 			$resp['status'] = 'success';
-			if(empty($id))
+			if (empty($id))
 				$resp['msg'] = " Este reporte ha sido agregado exitósamente.";
 			else
 				$resp['msg'] = " Este reporte ha sido actualizado exitósamente.";
 
 			$this->conn->query("UPDATE `project_list` set `status` ='1' where id = '{$project_id}' ");
-		}else{
+		} else {
 			$resp['status'] = 'failed';
 			$resp['msg'] = "Ocurrió un error.";
-			$resp['err'] = $this->conn->error."[{$sql}]";
+			$resp['err'] = $this->conn->error . "[{$sql}]";
 		}
-		if($resp['status'] =='success')
-			$this->settings->set_flashdata('success',$resp['msg']);
+		if ($resp['status'] == 'success')
+			$this->settings->set_flashdata('success', $resp['msg']);
 		return json_encode($resp);
 	}
-	function delete_report(){
+	function delete_report()
+	{
 		extract($_POST);
 		$del = $this->conn->query("DELETE FROM `report_list` where id = '{$id}'");
-		if($del){
+		if ($del) {
 			$resp['status'] = 'success';
-			$this->settings->set_flashdata('success'," Reporte ha sido eliminado exitósamente");
-		}else{
+			$this->settings->set_flashdata('success', " Reporte ha sido eliminado exitósamente");
+		} else {
 			$resp['status'] = 'failed';
 			$resp['error'] = $this->conn->error;
 		}
 		return json_encode($resp);
 	}
-	function save_task(){
-		extract($_POST);
-		$data = "";
-		
-		// Depuración: Verifica los datos recibidos
-		error_log(print_r($_POST, true)); // Log de los datos recibidos
-	
-		foreach($_POST as $k => $v){
-			if(!in_array($k, array('id'))){
-				if(!is_numeric($v))
-					$v = $this->conn->real_escape_string($v); // Escape de los valores
-				if(!empty($data)) $data .= ",";
-				$data .= " `{$k}`='{$v}' ";
-			}
+	function save_task()
+	{
+		// Asegurarse de que los valores vienen del formulario
+		$task_id = isset($_POST['task_id']) ? intval($_POST['task_id']) : 0;
+		$project_id = isset($_POST['project_id']) ? intval($_POST['project_id']) : 0;
+		$task = isset($_POST['task']) ? $this->conn->real_escape_string($_POST['task']) : '';
+		$description = isset($_POST['description']) ? $this->conn->real_escape_string($_POST['description']) : '';
+		$estimated_start_date = isset($_POST['estimated_start_date']) ? $_POST['estimated_start_date'] : null;
+		$estimated_end_date = isset($_POST['estimated_end_date']) ? $_POST['estimated_end_date'] : null;
+		$actual_start_date = isset($_POST['actual_start_date']) ? $_POST['actual_start_date'] : null;
+		$actual_end_date = isset($_POST['actual_end_date']) ? $_POST['actual_end_date'] : null;
+		$status = isset($_POST['status']) ? $this->conn->real_escape_string($_POST['status']) : 'Pendiente';
+		$responsible = isset($_POST['responsible']) ? intval($_POST['responsible']) : 0;
+		$task_type = isset($_POST['task_type']) ? $this->conn->real_escape_string($_POST['task_type']) : '';
+
+		// Definir la consulta SQL de inserción o actualización
+		if (empty($task_id)) {
+			// Inserción de nueva tarea
+			$sql = "INSERT INTO task_list (project_id, task, description, estimated_start_date, estimated_end_date, actual_start_date, actual_end_date, status, responsible, task_type) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+			$stmt = $this->conn->prepare($sql);
+			$stmt->bind_param("issssssiss", $project_id, $task, $description, $estimated_start_date, $estimated_end_date, $actual_start_date, $actual_end_date, $status, $responsible, $task_type);
+		} else {
+			// Actualización de tarea existente
+			$sql = "UPDATE task_list SET project_id = ?, task = ?, description = ?, estimated_start_date = ?, estimated_end_date = ?, actual_start_date = ?, actual_end_date = ?, status = ?, responsible = ?, task_type = ? 
+                WHERE task_id = ?";
+			$stmt = $this->conn->prepare($sql);
+			$stmt->bind_param("issssssissi", $project_id, $task, $description, $estimated_start_date, $estimated_end_date, $actual_start_date, $actual_end_date, $status, $responsible, $task_type, $task_id);
 		}
-	
-		if(empty($id)){
-			$sql = "INSERT INTO `task_list` SET {$data}";
-		}else{
-			$sql = "UPDATE `task_list` SET {$data} WHERE id = '{$id}'";
-		}
-	
-		// Depuración: Verifica la consulta SQL
-		error_log($sql); // Log de la consulta SQL
-	
-		$save = $this->conn->query($sql);
-	
-		if($save){
+
+		// Ejecutar la consulta SQL
+		if ($stmt->execute()) {
+			// Si la ejecución fue exitosa
 			$resp['status'] = 'success';
-			$resp['msg'] = empty($id) ? "Tarea agregada exitosamente." : "Tarea actualizada exitosamente.";
-		}else{
-			// Si hay error, loguear el error de la base de datos
+			$resp['msg'] = empty($task_id) ? "Tarea agregada exitosamente." : "Tarea actualizada exitosamente.";
+		} else {
+			// Si hubo un error en la consulta
 			$resp['status'] = 'failed';
-			$resp['error'] = $this->conn->error;
-			error_log("Error en la consulta: " . $this->conn->error); // Log de errores de MySQL
+			$resp['error'] = $stmt->error;
+			error_log("Error en la consulta: " . $stmt->error); // Log de errores
 		}
-		
+
+		// Cerrar la declaración preparada
+		$stmt->close();
+
 		return json_encode($resp);
 	}
-	function delete_task(){
+
+	function delete_task()
+	{
 		extract($_POST);
 		$del = $this->conn->query("DELETE FROM `task_list` WHERE id = '{$id}'");
-		if($del){
+		if ($del) {
 			$resp['status'] = 'success';
 			$resp['msg'] = "Tarea eliminada exitosamente.";
-		}else{
+		} else {
 			$resp['status'] = 'failed';
 			$resp['error'] = $this->conn->error;
 		}
 		return json_encode($resp);
 	}
-	function save_progress(){
+	function save_progress()
+	{
 		extract($_POST);
 		$data = "";
-	
+
 		// Se obtiene la información de los campos enviados en POST
-		foreach($_POST as $k => $v){
-			if(!in_array($k, array('id')) && !is_numeric($k)){
-				if($k == 'description')
+		foreach ($_POST as $k => $v) {
+			if (!in_array($k, array('id')) && !is_numeric($k)) {
+				if ($k == 'description')
 					$v = htmlentities(str_replace("'", "&#x2019;", $v));
-				if(empty($data)){
+				if (empty($data)) {
 					$data .= " $k='$v' ";
-				}else{
+				} else {
 					$data .= ", $k='$v' ";
 				}
 			}
 		}
-	
+
 		// Se calcula la duración del progreso
 		$dur = abs(strtotime($datetime_to) - strtotime($datetime_from)); // Calcula el tiempo en segundos
 		$dur = $dur / (60 * 60); // Convertimos a horas
 		$data .= ", duration='$dur' ";
-	
+
 		// Si no se pasa un ID, se crea un nuevo registro, si no, se actualiza el existente
-		if(empty($id)){
+		if (empty($id)) {
 			$data .= ", employee_id={$_SESSION['login_id']} ";
-	
-			$save = $this->db->query("INSERT INTO report_list SET $data");
-		}else{
-			$save = $this->db->query("UPDATE report_list SET $data WHERE id = $id");
+
+			$save = $this->conn->query("INSERT INTO report_list SET $data");
+		} else {
+			$save = $this->conn->query("UPDATE report_list SET $data WHERE id = $id");
 		}
-	
-		if($save){
+
+		// Si el progreso se guarda correctamente, actualizamos el progreso de la tarea
+		if ($save) {
+			// Aquí actualizamos el progreso de la tarea basada en la duración registrada
+			$this->update_task_progress($project_id, $employee_id);
 			return 1; // El guardado fue exitoso
 		}
 	}
-	function delete_progress(){
-		extract($_POST);
-		// Elimina el progreso según el ID recibido
-		$delete = $this->db->query("DELETE FROM report_list WHERE id = $id");
-		
-		if($delete){
-			return 1; // El progreso fue eliminado exitosamente
+
+	function update_task_progress($project_id, $employee_id)
+	{
+		// Consulta para obtener las tareas del proyecto
+		$task_query = $this->conn->query("SELECT * FROM task_list WHERE project_id = $project_id");
+
+		// Para cada tarea, se obtiene el progreso realizado por el empleado
+		while ($task = $task_query->fetch_assoc()) {
+			// Consulta el progreso registrado del empleado en la tarea
+			$progress_query = $this->conn->query("SELECT SUM(duration) as total_duration FROM report_list WHERE project_id = $project_id AND employee_id = $employee_id AND task_id = {$task['id']}");
+
+			$progress_data = $progress_query->fetch_assoc();
+			$total_duration = $progress_data['total_duration'];
+
+			// Calcula el progreso de la tarea en base al total de horas trabajadas
+			if ($total_duration > 0) {
+				$estimated_duration = abs(strtotime($task['estimated_end_date']) - strtotime($task['estimated_start_date'])) / (60 * 60); // Duración estimada en horas
+				$progress_percentage = ($total_duration / $estimated_duration) * 100;
+
+				// Asegurarse que el progreso no exceda el 100%
+				$progress_percentage = min($progress_percentage, 100);
+			} else {
+				$progress_percentage = 0; // Si no hay progreso, se deja en 0
+			}
+
+			// Actualiza el progreso de la tarea
+			$this->conn->query("UPDATE task_list SET progress = $progress_percentage WHERE id = {$task['id']}");
 		}
 	}
-	
+
+	function delete_progress()
+	{
+		// Validar y sanitizar el ID recibido
+		$id = isset($_POST['id']) ? intval($_POST['id']) : 0; // Asegurarse que el ID es un número entero
+		$project_id = isset($_POST['project_id']) ? intval($_POST['project_id']) : 0;
+		$employee_id = isset($_POST['employee_id']) ? intval($_POST['employee_id']) : 0;
+
+		// Comprobamos si el ID es válido antes de hacer la consulta
+		if ($id > 0) {
+			// Preparamos la consulta SQL de eliminación
+			$stmt = $this->db->prepare("DELETE FROM report_list WHERE id = ?");
+			$stmt->bind_param("i", $id); // "i" es para indicar que el parámetro es un entero
+
+			// Ejecutamos la consulta
+			$delete = $stmt->execute();
+
+			if ($delete) {
+				// Recalcular el progreso de la tarea después de eliminar el registro de progreso
+				$this->update_task_progress($project_id, $employee_id);
+				return 1; // El progreso fue eliminado exitosamente
+			} else {
+				return 0; // Error en la eliminación
+			}
+		}
+
+		return 0; // ID no válido
+	}
 }
+
 
 $Master = new Master();
 $action = !isset($_GET['f']) ? 'none' : strtolower($_GET['f']);
@@ -315,31 +396,31 @@ $sysset = new SystemSettings();
 switch ($action) {
 	case 'save_project':
 		echo $Master->save_project();
-	break;
+		break;
 	case 'save_task':
 		echo $Master->save_task();
-	break;
+		break;
 	case 'delete_task':
 		echo $Master->delete_task();
-	break;
+		break;
 	case 'delete_project':
 		echo $Master->delete_project();
-	break;
+		break;
 	case 'close_project':
 		echo $Master->close_project();
-	break;
+		break;
 	case 'save_work_type':
 		echo $Master->save_work_type();
-	break;
+		break;
 	case 'delete_work_type':
 		echo $Master->delete_work_type();
-	break;
+		break;
 	case 'save_report':
 		echo $Master->save_report();
-	break;
+		break;
 	case 'delete_report':
 		echo $Master->delete_report();
-	break;
+		break;
 	default:
 		// echo $sysset->index();
 		break;

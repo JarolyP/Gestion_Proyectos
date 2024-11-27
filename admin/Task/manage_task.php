@@ -1,22 +1,22 @@
 <?php
 require_once('../../config.php');
-if(isset($_GET['id'])){
+if (isset($_GET['id'])) {
     $qry = $conn->query("SELECT * FROM `task_list` where project_id = '{$_GET['id']}'");
-    if($qry->num_rows > 0){
+    if ($qry->num_rows > 0) {
         $res = $qry->fetch_array();
-        foreach($res as $k => $v){
-            if(!is_numeric($k))
-            $$k = $v;
+        foreach ($res as $k => $v) {
+            if (!is_numeric($k))
+                $$k = $v;
         }
     }
 }
 ?>
 <style>
-	img#cimg{
-		height: 17vh;
-		width: 25vw;
-		object-fit: scale-down;
-	}
+    img#cimg {
+        height: 17vh;
+        width: 25vw;
+        object-fit: scale-down;
+    }
 </style>
 <div class="container-fluid">
     <form action="" id="task-form">
@@ -64,71 +64,109 @@ if(isset($_GET['id'])){
 
         <div class="form-group">
             <label for="responsible" class="control-label">Empleados de la Tarea</label>
-            <input type="text" name="responsible" id="responsible" class="form-control form-control-border" placeholder="Ingresa Responsable" value="<?php echo isset($responsible) ? $responsible : '' ?>" required>
+            <select name="responsible" id="responsible" class="form-control form-control-border" required>
+                <option value="">Selecciona un Empleado</option>
+                <?php
+                // Consultar los empleados disponibles en la base de datos
+                $employees_query = $conn->query("SELECT id, CONCAT(firstname, ' ', lastname) AS full_name FROM employee_list WHERE status = 1 ORDER BY lastname ASC");
+
+                // Mostrar los empleados disponibles en el campo <select>
+                while ($employee = $employees_query->fetch_assoc()):
+                ?>
+                    <option value="<?php echo $employee['id']; ?>"><?php echo $employee['full_name']; ?></option>
+                <?php endwhile; ?>
+            </select>
         </div>
 
-        <div class="form-group">
-            <label for="progress" class="control-label">Tarea Predecesora</label>
-            <input type="number" name="progress" id="progress" class="form-control form-control-border" min="0" max="100" value="<?php echo isset($progress) ? $progress : '0' ?>" required>
-        </div>
 
         <div class="form-group">
             <label for="task_type" class="control-label">Proyecto al que pertenece</label>
-            <input type="text" name="task_type" id="task_type" class="form-control form-control-border" placeholder="Ingresa Tipo de Tarea" value="<?php echo isset($task_type) ? $task_type : '' ?>" required>
+            <select name="task_type" id="task_type" class="form-control form-control-border" required>
+                <option value="">Selecciona un Proyecto</option>
+                <?php
+                // Consultar los proyectos disponibles en la base de datos
+                $projects_query = $conn->query("SELECT id, title FROM project_list WHERE delete_flag = 0 ORDER BY title ASC");
+
+                // Mostrar los proyectos disponibles en el campo <select>
+                while ($project = $projects_query->fetch_assoc()):
+                ?>
+                    <option value="<?php echo $project['id']; ?>"><?php echo $project['title']; ?></option>
+                <?php endwhile; ?>
+            </select>
         </div>
-    </form>
-</div>
 
-<script>
-    $(function() {
-    $('#uni_modal #task-form').submit(function(e) {
-        e.preventDefault(); // Prevenir el comportamiento predeterminado del formulario
-        var _this = $(this);
-        $('.pop-msg').remove(); // Eliminar mensajes previos de error o éxito
 
-        var el = $('<div>');
-        el.addClass("pop-msg alert");
-        el.hide();
+        <script>
+            // Script para seleccionar el proyecto
+            document.querySelectorAll('.select-project-btn').forEach(function(button) {
+                button.addEventListener('click', function() {
+                    // Obtener el ID y el título del proyecto seleccionado
+                    var projectId = this.getAttribute('data-id');
+                    var projectTitle = this.getAttribute('data-title');
 
-        start_loader(); // Mostrar loader durante el proceso
+                    // Establecer el valor del input con el ID del proyecto seleccionado
+                    document.getElementById('task_type').value = projectTitle; // Puedes cambiar esto si prefieres guardar el ID
+                });
+            });
+            $(function() {
+                $('#uni_modal #task-form').submit(function(e) {
+                    e.preventDefault(); // Prevenir envío estándar del formulario
+                    var _this = $(this);
+                    $('.pop-msg').remove(); // Eliminar mensajes previos de error o éxito
 
-        var formData = new FormData(this);
+                    // Crear contenedor para mensajes dinámicos
+                    var el = $('<div>');
+                    el.addClass("pop-msg alert");
+                    el.hide();
 
-        $.ajax({
-            url: _base_url_ + "classes/Master.php?f=save_task", // Ruta del backend
-            data: formData,
-            cache: false, 
-            contentType: false,
-            processData: false,
-            method: 'POST',
-            dataType: 'json',
-            error: function(err) {
-                console.log("Error de AJAX:", err);
-                alert_toast("Ocurrió un error. Revisa la consola para más detalles.", 'error');
-                end_loader();
-            },
-            success: function(resp) {
-                console.log("Respuesta del servidor:", resp); // Depurar la respuesta
-                if (resp.status === 'success') {
-                    alert_toast("Tarea guardada con éxito.", 'success');
-                    setTimeout(function() {
-                        location.reload();
-                    }, 1500);
-                } else if (resp.msg) {
-                    el.addClass("alert-danger");
-                    el.text(resp.msg);
-                    _this.prepend(el);
-                } else {
-                    el.addClass("alert-danger");
-                    el.text("Se produjo un error debido a un motivo desconocido.");
-                    _this.prepend(el);
-                }
-                el.show('slow');
-                $('html,body,.modal').animate({ scrollTop: 0 }, 'fast');
-                end_loader();
-            }
-        });
-    });
-});
+                    start_loader(); // Mostrar loader mientras se procesa
 
-</script>
+                    var formData = new FormData(this); // Recoger los datos del formulario
+
+                    // Realizar la solicitud AJAX
+                    $.ajax({
+                        url: _base_url_ + "classes/Master.php?f=save_task", // Ruta hacia el backend
+                        data: formData,
+                        cache: false,
+                        contentType: false,
+                        processData: false,
+                        method: 'POST',
+                        dataType: 'json',
+                        error: function(err) {
+                            // Manejar errores de AJAX
+                            console.log("Error de AJAX:", err);
+                            alert_toast("Ocurrió un error. Revisa la consola para más detalles.", 'error');
+                            end_loader();
+                        },
+                        success: function(resp) {
+                            // Procesar respuesta del servidor
+                            console.log("Respuesta del servidor:", resp); // Depuración
+
+                            if (resp.status === 'success') {
+                                // Mensaje de éxito y recargar página
+                                alert_toast(resp.msg, 'success');
+                                setTimeout(function() {
+                                    location.reload();
+                                }, 1500);
+                            } else {
+                                // Mostrar errores devueltos por el backend
+                                el.addClass("alert-danger");
+                                if (resp.error) {
+                                    el.text("Error: " + resp.error);
+                                } else if (resp.msg) {
+                                    el.text(resp.msg);
+                                } else {
+                                    el.text("Se produjo un error desconocido.");
+                                }
+                                _this.prepend(el);
+                            }
+                            el.show('slow'); // Mostrar el mensaje de error
+                            $('html,body,.modal').animate({
+                                scrollTop: 0
+                            }, 'fast');
+                            end_loader(); // Ocultar loader
+                        }
+                    });
+                });
+            });
+        </script>
