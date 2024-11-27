@@ -40,6 +40,14 @@
                         </p>
                       </a>
                     </li>
+                    <li class="nav-item dropdown">
+                      <a href="<?php echo base_url ?>?page=projects" class="nav-link nav-task">
+                        <i class="nav-icon fas fa-tasks"></i>
+                        <p>
+                          Tareas
+                        </p>
+                      </a>
+                    </li>
                     <li class="nav-header">Reports</li>
                       <li class="nav-item dropdown">
                         <a href="<?php echo base_url ?>?page=reports/by_employee" class="nav-link nav-reports_by_employee">
