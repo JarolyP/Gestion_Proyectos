@@ -131,7 +131,7 @@ if(isset($_GET['id'])){
             _conf("¿Estás segur@ de cerrar esta tarea?","close_task",["<?= isset($id) ? $id : '' ?>"])
         })
         $('.view_data').click(function(){
-            uni_modal("Detalles de la Tarea","Task/view_report.php?id="+$(this).attr('data-id'),"mid-large")
+            uni_modal("Detalles de la Tarea","Task/view_report_task.php?id="+$(this).attr('data-id'),"mid-large")
         })
         $('.table td, .table th').addClass('py-1 px-2 align-middle')
         $('.table').dataTable({

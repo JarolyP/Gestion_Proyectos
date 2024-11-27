@@ -55,7 +55,7 @@ if(isset($_GET['id'])){
         <div class="form-group">
             <label for="status" class="control-label">Estado</label>
             <select name="status" id="status" class="form-control form-control-border" required>
-                <option value="Pendiente" <?php echo (isset($status) && $status == 'Pendiente') ? 'selected' : '' ?>>Pendiente</option>
+                <option value="Pendiente" <?php echo (isset($status) && $status == 'Nuevo') ? 'selected' : '' ?>>Nuevo</option>
                 <option value="En Proceso" <?php echo (isset($status) && $status == 'En Proceso') ? 'selected' : '' ?>>En Proceso</option>
                 <option value="Completada" <?php echo (isset($status) && $status == 'Completada') ? 'selected' : '' ?>>Completada</option>
                 <option value="Cancelada" <?php echo (isset($status) && $status == 'Cancelada') ? 'selected' : '' ?>>Cancelada</option>
@@ -63,17 +63,17 @@ if(isset($_GET['id'])){
         </div>
 
         <div class="form-group">
-            <label for="responsible" class="control-label">Responsable de la Tarea</label>
+            <label for="responsible" class="control-label">Empleados de la Tarea</label>
             <input type="text" name="responsible" id="responsible" class="form-control form-control-border" placeholder="Ingresa Responsable" value="<?php echo isset($responsible) ? $responsible : '' ?>" required>
         </div>
 
         <div class="form-group">
-            <label for="progress" class="control-label">Progreso (%)</label>
+            <label for="progress" class="control-label">Tarea Predecesora</label>
             <input type="number" name="progress" id="progress" class="form-control form-control-border" min="0" max="100" value="<?php echo isset($progress) ? $progress : '0' ?>" required>
         </div>
 
         <div class="form-group">
-            <label for="task_type" class="control-label">Tipo de Tarea</label>
+            <label for="task_type" class="control-label">Proyecto al que pertenece</label>
             <input type="text" name="task_type" id="task_type" class="form-control form-control-border" placeholder="Ingresa Tipo de Tarea" value="<?php echo isset($task_type) ? $task_type : '' ?>" required>
         </div>
     </form>
@@ -81,56 +81,54 @@ if(isset($_GET['id'])){
 
 <script>
     $(function() {
-        $('#uni_modal #task-form').submit(function(e) {
-            e.preventDefault(); // Prevenir el comportamiento predeterminado del formulario
-            var _this = $(this);
-            $('.pop-msg').remove(); // Eliminar mensajes previos de error o éxito
+    $('#uni_modal #task-form').submit(function(e) {
+        e.preventDefault(); // Prevenir el comportamiento predeterminado del formulario
+        var _this = $(this);
+        $('.pop-msg').remove(); // Eliminar mensajes previos de error o éxito
 
-            var el = $('<div>');
-            el.addClass("pop-msg alert");
-            el.hide();
+        var el = $('<div>');
+        el.addClass("pop-msg alert");
+        el.hide();
 
-            start_loader(); // Mostrar loader durante el proceso
+        start_loader(); // Mostrar loader durante el proceso
 
-            // Usar FormData para enviar datos del formulario con soporte de archivos
-            var formData = new FormData(this);
+        var formData = new FormData(this);
 
-            $.ajax({
-                url: _base_url_ + "classes/Master.php?f=save_task", // Ruta del backend
-                data: formData,
-                cache: false, // No almacenar en caché la solicitud
-                contentType: false, // No configurar manualmente el encabezado
-                processData: false, // Evitar transformar los datos
-                method: 'POST', // Método HTTP
-                dataType: 'json', // Respuesta esperada del servidor
-                error: function(err) {
-                    console.log("Error de AJAX:", err); // Mostrar error en la consola
-                    alert_toast("Ocurrió un error. Revisa la consola para más detalles.", 'error');
-                    end_loader(); // Ocultar loader
-                },
-                success: function(resp) {
-                    // Evaluar el estado de la respuesta
-                    if (resp.status === 'success') {
-                        alert_toast("Tarea guardada con éxito.", 'success');
-                        setTimeout(function() {
-                            location.reload(); // Recargar la página
-                        }, 1500); // Retraso de 1.5 segundos
-                    } else if (resp.msg) {
-                        // Mensaje de error personalizado del servidor
-                        el.addClass("alert-danger");
-                        el.text(resp.msg);
-                        _this.prepend(el);
-                    } else {
-                        // Mensaje de error genérico
-                        el.addClass("alert-danger");
-                        el.text("Se produjo un error debido a un motivo desconocido.");
-                        _this.prepend(el);
-                    }
-                    el.show('slow'); // Mostrar el mensaje de error
-                    $('html,body,.modal').animate({ scrollTop: 0 }, 'fast'); // Desplazar al inicio del modal
-                    end_loader(); // Ocultar loader
+        $.ajax({
+            url: _base_url_ + "classes/Master.php?f=save_task", // Ruta del backend
+            data: formData,
+            cache: false, 
+            contentType: false,
+            processData: false,
+            method: 'POST',
+            dataType: 'json',
+            error: function(err) {
+                console.log("Error de AJAX:", err);
+                alert_toast("Ocurrió un error. Revisa la consola para más detalles.", 'error');
+                end_loader();
+            },
+            success: function(resp) {
+                console.log("Respuesta del servidor:", resp); // Depurar la respuesta
+                if (resp.status === 'success') {
+                    alert_toast("Tarea guardada con éxito.", 'success');
+                    setTimeout(function() {
+                        location.reload();
+                    }, 1500);
+                } else if (resp.msg) {
+                    el.addClass("alert-danger");
+                    el.text(resp.msg);
+                    _this.prepend(el);
+                } else {
+                    el.addClass("alert-danger");
+                    el.text("Se produjo un error debido a un motivo desconocido.");
+                    _this.prepend(el);
                 }
-            });
+                el.show('slow');
+                $('html,body,.modal').animate({ scrollTop: 0 }, 'fast');
+                end_loader();
+            }
         });
     });
+});
+
 </script>

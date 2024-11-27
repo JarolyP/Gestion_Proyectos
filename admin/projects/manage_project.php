@@ -1,22 +1,22 @@
 <?php
 require_once('../../config.php');
-if(isset($_GET['id'])){
+if (isset($_GET['id'])) {
     $qry = $conn->query("SELECT * FROM `project_list` where id = '{$_GET['id']}'");
-    if($qry->num_rows > 0){
+    if ($qry->num_rows > 0) {
         $res = $qry->fetch_array();
-        foreach($res as $k => $v){
-            if(!is_numeric($k))
-            $$k = $v;
+        foreach ($res as $k => $v) {
+            if (!is_numeric($k))
+                $$k = $v;
         }
     }
 }
 ?>
 <style>
-	img#cimg{
-		height: 17vh;
-		width: 25vw;
-		object-fit: scale-down;
-	}
+    img#cimg {
+        height: 17vh;
+        width: 25vw;
+        object-fit: scale-down;
+    }
 </style>
 <div class="container-fluid">
     <form action="" id="project-form">
@@ -43,9 +43,21 @@ if(isset($_GET['id'])){
         </div>
 
         <div class="form-group">
-            <label for="responsible" class="control-label">Responsable del Proyecto</label>
-            <input type="text" name="responsible" id="responsible" class="form-control form-control-border" placeholder="Ingresa Responsable del Proyecto" value="<?php echo isset($responsible) ? $responsible : '' ?>" required>
-        </div>
+    <label for="responsible" class="control-label">Responsable del Proyecto</label>
+    <select name="responsible" id="responsible" class="form-control form-control-border" required>
+        <option value="">Selecciona un responsable</option>
+        <?php 
+            // Obtener los empleados de la tabla 'employee_list'
+            $staff_query = $conn->query("SELECT id, firstname, lastname FROM employee_list WHERE status = 1");
+            while($staff = $staff_query->fetch_array()):
+        ?>
+            <option value="<?php echo $staff['id']; ?>" <?php echo (isset($responsible) && $responsible == $staff['id']) ? 'selected' : '' ?>>
+                <?php echo $staff['firstname'] . ' ' . $staff['lastname']; ?>
+            </option>
+        <?php endwhile; ?>
+    </select>
+</div>
+
 
         <div class="form-group">
             <label for="status" class="control-label">Estado</label>
@@ -54,8 +66,7 @@ if(isset($_GET['id'])){
                 <option value="En Proceso" <?php echo (isset($status) && $status == 'En Proceso') ? 'selected' : '' ?>>En Proceso</option>
                 <option value="Cancelado" <?php echo (isset($status) && $status == 'Cancelado') ? 'selected' : '' ?>>Cancelado</option>
                 <option value="Terminado" <?php echo (isset($status) && $status == 'Terminado') ? 'selected' : '' ?>>Terminado</option>
-                <option value="Pendiente" <?php echo (isset($status) && $status == 'Pendiente') ? 'selected' : '' ?>>Pendiente</option>
-                <option value="Cerrado" <?php echo (isset($status) && $status == 'Cerrado') ? 'selected' : '' ?>>Cerrado</option>
+                <option value="En Planificación" <?php echo (isset($status) && $status == 'En Planificación') ? 'selected' : '' ?>>En Planificación</option>
             </select>
         </div>
     </form>
@@ -109,7 +120,9 @@ if(isset($_GET['id'])){
                         _this.prepend(el);
                     }
                     el.show('slow'); // Mostrar el mensaje de error
-                    $('html,body,.modal').animate({ scrollTop: 0 }, 'fast'); // Desplazar al inicio del modal
+                    $('html,body,.modal').animate({
+                        scrollTop: 0
+                    }, 'fast'); // Desplazar al inicio del modal
                     end_loader(); // Ocultar loader
                 }
             });

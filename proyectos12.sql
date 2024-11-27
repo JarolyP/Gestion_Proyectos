@@ -48,7 +48,7 @@ CREATE TABLE `employee_list` (
 
 LOCK TABLES `employee_list` WRITE;
 /*!40000 ALTER TABLE `employee_list` DISABLE KEYS */;
-INSERT INTO `employee_list` VALUES (6,'2022-0005','Juan','','Empleado','Male','jempleado@cweb.com','Tecnologías Información','Líder de Desarrollo','84fb4ea96934cc52c6ab2851c38f8a92','g9cd0arm',1,'uploads/employee-6.png?v=1642970869','2022-01-23 15:47:49','2022-01-23 15:51:39'),(10,'','Jaroly','asdfadfaf','Polanco','Female','jobs13az@gmail.com','Desarrollo','Tecnico','06305e2e9d85745cdc2ae1ea00a413fc','mosa8guv',1,NULL,'2024-11-22 19:52:01',NULL);
+INSERT INTO `employee_list` VALUES (6,'2022-0005','Juan','','Empleado','Male','jempleado@cweb.com','Tecnologías Información','Líder de Desarrollo','84fb4ea96934cc52c6ab2851c38f8a92','g9cd0arm',1,'uploads/employee-6.png?v=1642970869','2022-01-23 15:47:49','2022-01-23 15:51:39'),(10,'','Jaroly','asdfadfaf','Polanco','Hombre','jobs13az@gmail.com','Desarrollo','Tecnico','06305e2e9d85745cdc2ae1ea00a413fc','mosa8guv',0,NULL,'2024-11-22 19:52:01','2024-11-26 17:22:19');
 /*!40000 ALTER TABLE `employee_list` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -67,12 +67,12 @@ CREATE TABLE `project_list` (
   `start_date` date DEFAULT NULL,
   `end_date` date DEFAULT NULL,
   `responsible` varchar(255) NOT NULL,
-  `status` enum('Nuevo','En Proceso','Cancelado','Terminado','En Planificacion') NOT NULL DEFAULT 'Nuevo' COMMENT 'Estado del proyecto',
+  `status` enum('Nuevo','En Proceso','Cancelado','Terminado','Pendiente','Cerrado') NOT NULL DEFAULT 'Nuevo' COMMENT 'Estado del proyecto',
   `delete_flag` tinyint(1) NOT NULL DEFAULT 0,
   `date_created` datetime NOT NULL DEFAULT current_timestamp(),
   `date_updated` datetime DEFAULT NULL ON UPDATE current_timestamp(),
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -81,7 +81,7 @@ CREATE TABLE `project_list` (
 
 LOCK TABLES `project_list` WRITE;
 /*!40000 ALTER TABLE `project_list` DISABLE KEYS */;
-INSERT INTO `project_list` VALUES (13,'asdfasfdasddas','','','0000-00-00','0000-00-00','','Nuevo',1,'2024-11-24 21:04:48','2024-11-24 21:05:29');
+INSERT INTO `project_list` VALUES (19,'Gestión de Usuarios','Sistema de gestión de usuarios para la web','Desarrollar un sistema de gestión de usuarios con registro, inicio de sesión y administración.','2024-12-01','2025-06-01','Juan Pérez','En Proceso',0,'2024-11-26 10:00:00',NULL),(20,'E-commerce','Desarrollo de una plataforma de comercio electrónico','Construir una plataforma de ventas online con carrito de compras, gestión de inventarios y pagos integrados.','2024-11-15','2025-05-01','Carlos Ramírez','Nuevo',0,'2024-11-26 11:00:00',NULL),(21,'Aplicación Móvil','Aplicación móvil para gestión de tareas','Crear una app que permita a los usuarios gestionar sus tareas diarias, con notificaciones y sincronización en la nube.','2024-12-10','2025-04-30','Maria López','Pendiente',0,'2024-11-26 12:00:00',NULL),(22,'Gestión de Usuarios','Sistema de gestión de usuarios para la web','Desarrollar un sistema de gestión de usuarios con registro, inicio de sesión y administración.','2024-12-01','2025-06-01','Juan Pérez','En Proceso',0,'2024-11-26 10:00:00',NULL),(23,'E-commerce','Desarrollo de una plataforma de comercio electrónico','Construir una plataforma de ventas online con carrito de compras, gestión de inventarios y pagos integrados.','2024-11-15','2025-05-01','Carlos Ramírez','Nuevo',0,'2024-11-26 11:00:00',NULL),(24,'hjgkgh','','','0000-00-00','0000-00-00','6','Nuevo',0,'2024-11-26 21:09:47',NULL);
 /*!40000 ALTER TABLE `project_list` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -110,7 +110,7 @@ CREATE TABLE `report_list` (
   CONSTRAINT `report_list_ibfk_1` FOREIGN KEY (`project_id`) REFERENCES `project_list` (`id`) ON DELETE CASCADE,
   CONSTRAINT `report_list_ibfk_2` FOREIGN KEY (`work_type_id`) REFERENCES `work_type_list` (`id`) ON DELETE CASCADE,
   CONSTRAINT `report_list_ibfk_3` FOREIGN KEY (`employee_id`) REFERENCES `employee_list` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -180,6 +180,7 @@ CREATE TABLE `task_list` (
 
 LOCK TABLES `task_list` WRITE;
 /*!40000 ALTER TABLE `task_list` DISABLE KEYS */;
+INSERT INTO `task_list` VALUES (1,101,19,'Diseño de interfaz','Diseñar la interfaz de usuario para el sistema de gestión de usuarios.','2024-12-01','2024-12-10','2024-12-01','2024-12-09','Pendiente','Juan Pérez',0,'Diseño','2024-11-26 10:00:00'),(2,102,20,'Desarrollo de backend','Desarrollar la API para la gestión de usuarios y sus roles.','2024-12-05','2024-12-20','2024-12-05','2024-12-19','En Proceso','Carlos Ramírez',50,'Desarrollo','2024-11-26 11:00:00'),(3,103,21,'Configuración de servidor','Configurar el servidor para la plataforma de e-commerce.','2024-11-18','2024-11-25','2024-11-18','2024-11-24','Completada','Maria López',100,'Infraestructura','2024-11-26 12:00:00');
 /*!40000 ALTER TABLE `task_list` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -255,4 +256,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-11-24 22:11:39
+-- Dump completed on 2024-11-26 21:50:56

@@ -164,7 +164,7 @@ function duration($dur = 0){
 		   var _p = $('#outprint').clone()
 		   var _h = $('head').clone()
 		   var _el = $('<div>')
-		   _h.find("title").text("Reporte de Tiempo Trabajado por Proyecto Por Empleado - ConfiguroWeb")
+		   _h.find("title").text("Reporte de Tiempo Trabajado por Proyecto Por Emplead")
 		   _p.find('tr.text-light').removeClass('text-light bg-gradient-primary bg-lightblue')
 		   _el.append(_h)
 		   _el.append(_p)
