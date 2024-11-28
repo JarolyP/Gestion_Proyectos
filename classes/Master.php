@@ -32,13 +32,47 @@ class Master extends DBConnection
 		// Depuración: Verificar los datos recibidos
 		error_log(print_r($_POST, true)); // Log de los datos recibidos
 
-		// Verificar que las fechas y el estado estén presentes
-		if (!isset($start_date) || !isset($end_date) || !isset($status)) {
+		// Validar y establecer el estado basado en fechas
+		if (!empty($start_date_real) || !empty($end_date_real)) {
+			$status = "En Progreso";
+		} elseif (!empty($start_date) && !empty($end_date)) {
+			$status = "En Planificación";
+		} else {
+			$status = "Nuevo";
+		}
+
+		// Validar rangos de fechas
+		if (!empty($start_date) && !empty($end_date) && strtotime($end_date) < strtotime($start_date)) {
 			$resp['status'] = 'failed';
-			$resp['msg'] = 'Las fechas y el estado son obligatorios.';
+			$resp['msg'] = 'La fecha estimada de fin no puede ser anterior a la fecha de inicio.';
 			return json_encode($resp);
 		}
 
+		if (!empty($start_date_real) && !empty($end_date_real) && strtotime($end_date_real) < strtotime($start_date_real)) {
+			$resp['status'] = 'failed';
+			$resp['msg'] = 'La fecha real de fin no puede ser anterior a la fecha de inicio.';
+			return json_encode($resp);
+		}
+
+		// Validar que las fechas reales no estén dentro del rango estimado
+		if (!empty($start_date) && !empty($end_date)) {
+			if (!empty($start_date_real) && strtotime($start_date_real) >= strtotime($start_date) && strtotime($start_date_real) <= strtotime($end_date)) {
+				$resp['status'] = 'failed';
+				$resp['msg'] = 'La fecha real de inicio no puede estar dentro del rango de fechas estimadas.';
+				return json_encode($resp);
+			}
+
+			if (!empty($end_date_real) && strtotime($end_date_real) >= strtotime($start_date) && strtotime($end_date_real) <= strtotime($end_date)) {
+				$resp['status'] = 'failed';
+				$resp['msg'] = 'La fecha real de fin no puede estar dentro del rango de fechas estimadas.';
+				return json_encode($resp);
+			}
+		}
+
+		// Añadir el estado al arreglo de datos
+		$_POST['status'] = $status;
+
+		// Construir el conjunto de datos para la consulta SQL
 		foreach ($_POST as $k => $v) {
 			if (!in_array($k, array('id'))) {
 				if (!is_numeric($v))
@@ -56,10 +90,10 @@ class Master extends DBConnection
 		} else {
 			// Crear o actualizar el registro
 			if (empty($id)) {
-				// Agregar el nuevo proyecto, incluyendo las fechas reales y estado
+				// Agregar el nuevo proyecto
 				$sql = "INSERT INTO `project_list` SET {$data}";
 			} else {
-				// Actualizar el proyecto, incluyendo las fechas reales y estado
+				// Actualizar el proyecto existente
 				$sql = "UPDATE `project_list` SET {$data} WHERE id = '{$id}'";
 			}
 
@@ -77,7 +111,7 @@ class Master extends DBConnection
 				// Si ocurre un error, mostrar detalles del error
 				$resp['status'] = 'failed';
 				$resp['msg'] = "Ocurrió un error al guardar los datos.";
-				$resp['error'] = $this->conn->error;  // Detalles del error de la consulta
+				$resp['error'] = $this->conn->error; // Detalles del error de la consulta
 			}
 		}
 
@@ -87,6 +121,8 @@ class Master extends DBConnection
 
 		return json_encode($resp); // Devolver respuesta en formato JSON
 	}
+
+
 
 
 	function delete_project()
@@ -291,102 +327,9 @@ class Master extends DBConnection
 		}
 		return json_encode($resp);
 	}
-	function save_progress()
-	{
-		extract($_POST);
-		$data = "";
+	
 
-		// Se obtiene la información de los campos enviados en POST
-		foreach ($_POST as $k => $v) {
-			if (!in_array($k, array('id')) && !is_numeric($k)) {
-				if ($k == 'description')
-					$v = htmlentities(str_replace("'", "&#x2019;", $v));
-				if (empty($data)) {
-					$data .= " $k='$v' ";
-				} else {
-					$data .= ", $k='$v' ";
-				}
-			}
-		}
-
-		// Se calcula la duración del progreso
-		$dur = abs(strtotime($datetime_to) - strtotime($datetime_from)); // Calcula el tiempo en segundos
-		$dur = $dur / (60 * 60); // Convertimos a horas
-		$data .= ", duration='$dur' ";
-
-		// Si no se pasa un ID, se crea un nuevo registro, si no, se actualiza el existente
-		if (empty($id)) {
-			$data .= ", employee_id={$_SESSION['login_id']} ";
-
-			$save = $this->conn->query("INSERT INTO report_list SET $data");
-		} else {
-			$save = $this->conn->query("UPDATE report_list SET $data WHERE id = $id");
-		}
-
-		// Si el progreso se guarda correctamente, actualizamos el progreso de la tarea
-		if ($save) {
-			// Aquí actualizamos el progreso de la tarea basada en la duración registrada
-			$this->update_task_progress($project_id, $employee_id);
-			return 1; // El guardado fue exitoso
-		}
-	}
-
-	function update_task_progress($project_id, $employee_id)
-	{
-		// Consulta para obtener las tareas del proyecto
-		$task_query = $this->conn->query("SELECT * FROM task_list WHERE project_id = $project_id");
-
-		// Para cada tarea, se obtiene el progreso realizado por el empleado
-		while ($task = $task_query->fetch_assoc()) {
-			// Consulta el progreso registrado del empleado en la tarea
-			$progress_query = $this->conn->query("SELECT SUM(duration) as total_duration FROM report_list WHERE project_id = $project_id AND employee_id = $employee_id AND task_id = {$task['id']}");
-
-			$progress_data = $progress_query->fetch_assoc();
-			$total_duration = $progress_data['total_duration'];
-
-			// Calcula el progreso de la tarea en base al total de horas trabajadas
-			if ($total_duration > 0) {
-				$estimated_duration = abs(strtotime($task['estimated_end_date']) - strtotime($task['estimated_start_date'])) / (60 * 60); // Duración estimada en horas
-				$progress_percentage = ($total_duration / $estimated_duration) * 100;
-
-				// Asegurarse que el progreso no exceda el 100%
-				$progress_percentage = min($progress_percentage, 100);
-			} else {
-				$progress_percentage = 0; // Si no hay progreso, se deja en 0
-			}
-
-			// Actualiza el progreso de la tarea
-			$this->conn->query("UPDATE task_list SET progress = $progress_percentage WHERE id = {$task['id']}");
-		}
-	}
-
-	function delete_progress()
-	{
-		// Validar y sanitizar el ID recibido
-		$id = isset($_POST['id']) ? intval($_POST['id']) : 0; // Asegurarse que el ID es un número entero
-		$project_id = isset($_POST['project_id']) ? intval($_POST['project_id']) : 0;
-		$employee_id = isset($_POST['employee_id']) ? intval($_POST['employee_id']) : 0;
-
-		// Comprobamos si el ID es válido antes de hacer la consulta
-		if ($id > 0) {
-			// Preparamos la consulta SQL de eliminación
-			$stmt = $this->db->prepare("DELETE FROM report_list WHERE id = ?");
-			$stmt->bind_param("i", $id); // "i" es para indicar que el parámetro es un entero
-
-			// Ejecutamos la consulta
-			$delete = $stmt->execute();
-
-			if ($delete) {
-				// Recalcular el progreso de la tarea después de eliminar el registro de progreso
-				$this->update_task_progress($project_id, $employee_id);
-				return 1; // El progreso fue eliminado exitosamente
-			} else {
-				return 0; // Error en la eliminación
-			}
-		}
-
-		return 0; // ID no válido
-	}
+	
 }
 
 

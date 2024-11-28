@@ -34,8 +34,8 @@ foreach($user->fetch_array() as $k =>$v){
 			<div class="row">
 				<div class="form-group col-md-4">
 					<select name="gender" id="gender" class="form-control form-control-sm form-control-border" required>
-						<option <?= isset($gender) && $gender =='Male' ? 'selected' : "" ?>>Masculino</option>
-						<option <?= isset($gender) && $gender =='Female' ? 'selected' : "" ?>>Femenino</option>
+						<option <?= isset($gender) && $gender =='Masculina' ? 'selected' : "" ?>>Masculino</option>
+						<option <?= isset($gender) && $gender =='Femenina' ? 'selected' : "" ?>>Femenino</option>
 					</select>
 					<small class="mx-2">Género</small>
 				</div>

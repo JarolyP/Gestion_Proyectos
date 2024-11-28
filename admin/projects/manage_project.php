@@ -51,13 +51,13 @@ if (isset($_GET['id'])) {
         <div class="form-group">
             <label for="start_date" class="control-label">Fecha Estimada de Inicio</label>
             <input type="date" name="start_date" id="start_date" class="form-control form-control-border"
-                value="<?php echo isset($start_date) ? $start_date : '' ?>" onchange="toggleRealDates2(); validateEndDate(); updateStatus();">
+                value="<?php echo isset($start_date) ? $start_date : '' ?>" onchange="validateRealDatesRange(); validateEndDate(); updateStatus();">
         </div>
 
         <div class="form-group">
             <label for="end_date" class="control-label">Fecha Estimada de Fin</label>
             <input type="date" name="end_date" id="end_date" class="form-control form-control-border"
-                value="<?php echo isset($end_date) ? $end_date : '' ?>" onchange="toggleRealDates2(); validateEndDate();  updateStatus();">
+                value="<?php echo isset($end_date) ? $end_date : '' ?>" onchange="validateRealDatesRange(); validateEndDate();  updateStatus();">
         </div>
 
         <div class="form-group">
@@ -93,22 +93,44 @@ if (isset($_GET['id'])) {
         }
     }
 
-    function toggleRealDates2() {
-        const startDateEstimated = document.getElementById('start_date').value;
-        const endDateEstimated = document.getElementById('end_date').value;
+    function validateRealDatesRange() {
+    const startDateEstimated = document.getElementById('start_date').value;
+    const endDateEstimated = document.getElementById('end_date').value;
+    const startDateReal = document.getElementById('start_date_real').value;
+    const endDateReal = document.getElementById('end_date_real').value;
 
-        const startDateReal = document.getElementById('start_date_real');
-        const endDateReal = document.getElementById('end_date_real');
+    if (startDateEstimated && endDateEstimated) {
+        const startEstimated = new Date(startDateEstimated);
+        const endEstimated = new Date(endDateEstimated);
 
-        // Si se ha seleccionado una fecha estimada de inicio o fin, deshabilitamos las fechas reales
-        if (startDateEstimated || endDateEstimated) {
-            startDateReal.disabled = true;
-            endDateReal.disabled = true;
-        } else {
-            startDateReal.disabled = false;
-            endDateReal.disabled = false;
+        // Validar fecha de inicio real
+        if (startDateReal) {
+            const startReal = new Date(startDateReal);
+            if (startReal >= startEstimated && startReal <= endEstimated) {
+                alert('La fecha de inicio real no puede estar dentro del rango de las fechas estimadas.');
+                document.getElementById('start_date_real').value = ''; // Restablece el campo
+                return false;
+            }
+        }
+
+        // Validar fecha de fin real
+        if (endDateReal) {
+            const endReal = new Date(endDateReal);
+            if (endReal >= startEstimated && endReal <= endEstimated) {
+                alert('La fecha de fin real no puede estar dentro del rango de las fechas estimadas.');
+                document.getElementById('end_date_real').value = ''; // Restablece el campo
+                return false;
+            }
         }
     }
+
+    return true; // Si pasa las validaciones
+}
+
+// Llama a esta función cuando cambien las fechas reales
+document.getElementById('start_date_real').addEventListener('change', validateRealDatesRange);
+document.getElementById('end_date_real').addEventListener('change', validateRealDatesRange);
+
 
     function toggleRealDates1() {
         const startDateEstimated = document.getElementById('start_date');

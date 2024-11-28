@@ -33,6 +33,8 @@
                         <th>#</th>
                         <th>Fecha de Creación</th>
                         <th>Título</th>
+                        <th>Fecha Est. de Inicio</th>
+                        <th>Fecha Est. de Fin</th>
                         <th>Fecha de Inicio</th>
                         <th>Fecha de Fin</th>
                         <th>Responsable</th>
@@ -50,22 +52,7 @@
                     }
 
                     // Realizar la consulta para obtener los proyectos y los responsables (usuarios tipo 2)
-                    $qry = $conn->query("
-                        SELECT 
-                            p.*, 
-                            CONCAT(u.firstname, ' ', u.lastname) as responsible_name 
-                        FROM 
-                            `project_list` p 
-                        LEFT JOIN 
-                            `users` u 
-                        ON 
-                            p.responsible = u.id 
-                        WHERE 
-                            p.delete_flag = 0 
-                            AND u.type = 2  -- Filtrar solo usuarios de tipo 2 (staff)
-                        ORDER BY 
-                            p.title ASC
-                    ");
+                    $qry = $conn->query("SELECT p.*, CONCAT(u.firstname, ' ', u.lastname) as responsible_name FROM `project_list` p LEFT JOIN `users` u ON p.responsible = u.id WHERE p.delete_flag = 0 AND u.type = 2  -- Filtrar solo usuarios de tipo 2 (staff)ORDER B p.title ASC");
 
                     // Comprobar si la consulta fue exitosa antes de intentar acceder a la variable $qry
                     if (!$qry) {
@@ -77,6 +64,8 @@
                                 <td class="text-center"><?php echo $i++; ?></td>
                                 <td class=""><?php echo date("Y-m-d H:i", strtotime($row['date_created'])); ?></td>
                                 <td class=""><?php echo htmlspecialchars($row['title']); ?></td>
+                                <td class=""><?php echo $row['actual_start_date'] ? date("Y-m-d", strtotime($row['actual_start_date'])) : 'No definida'; ?></td>
+                                <td class=""><?php echo $row['actual_end_date'] ? date("Y-m-d", strtotime($row['actual_end_date'])) : 'No definida'; ?></td>
                                 <td class=""><?php echo $row['start_date'] ? date("Y-m-d", strtotime($row['start_date'])) : 'No definida'; ?></td>
                                 <td class=""><?php echo $row['end_date'] ? date("Y-m-d", strtotime($row['end_date'])) : 'No definida'; ?></td>
                                 <td class=""><?php echo htmlspecialchars($row['responsible_name']) ? $row['responsible_name'] : 'Sin Responsable'; ?></td>
@@ -110,7 +99,7 @@
                                         <a class="dropdown-item" href="./?page=projects/view_project&id=<?= $row['id'] ?>" data-id="<?php echo $row['id'] ?>">
                                             <span class="fa fa-eye text-dark"></span> Ver
                                         </a>
-                                        <?php if ($row['status'] != 'Cerrado'): ?>
+                                        <?php if ($row['status'] != 'Cancelado'): ?>
                                             <div class="dropdown-divider"></div>
                                             <a class="dropdown-item edit_data" href="javascript:void(0)" data-id="<?php echo $row['id'] ?>">
                                                 <span class="fa fa-edit text-primary"></span> Editar
