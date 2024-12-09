@@ -1,210 +1,130 @@
+<style>
+    .img-thumb-path {
+        width: 100px;
+        height: 80px;
+        object-fit: scale-down;
+        object-position: center center;
+    }
+</style>
 <?php
-if (isset($_GET['tid']))
-    $tid = $_GET['tid'];
-$task = "N/A";
-
-function duration($start, $end)
+function duration($dur = 0)
 {
-    if (!$start || !$end) {
+    if ($dur == 0) {
         return "00:00";
     }
-    $start_time = strtotime($start);
-    $end_time = strtotime($end);
-    $dur = $end_time - $start_time;
     $hours = floor($dur / (60 * 60));
-    $min = floor($dur / 60) % 60;
-    return sprintf("%'.02d", $hours) . ":" . sprintf("%'.02d", $min);
+    $min = floor($dur / (60)) - ($hours * 60);
+    $dur = sprintf("%'.02d", $hours) . ":" . sprintf("%'.02d", $min);
+    return $dur;
 }
 ?>
 <div class="card card-outline card-primary rounded-0 shadow">
     <div class="card-header">
-        <h3 class="card-title">Reporte de Tiempo Por Tarea</h3>
+        <h3 class="card-title">Informe de tiempo trabajado por Tarea</h3>
+        <div class="card-tools">
+            <button class="btn btn-sm btn-flat btn-success" id="print"><i class="fa fa-print"></i>Imprimir</button>
+            <button class="btn btn-sm btn-flat btn-success" id="print"><i class="fa fa-print"></i>Grafico</button>
+        </div>
     </div>
     <div class="card-body">
-        <div class="callout border-primary">
-            <fieldset>
-                <legend>Filtro</legend>
-                <form action="" id="filter">
-                    <div class="row align-items-end">
-                        <div class="form-group col-md-4">
-                            <label for="" class="control-label">Tarea</label>
-                            <select name="tid" id="tid" class="form-control form-control-sm select2">
-                                <?php
-                                $tasks = $conn->query("SELECT id, task FROM `task_list` ORDER BY `task` ASC");
-                                while ($row = $tasks->fetch_assoc()):
-                                    if (!isset($tid)) {
-                                        $tid = $row['id'];
-                                    }
-                                    if ($tid == $row['id'])
-                                        $task = strtoupper($row['task']);
-                                ?>
-                                    <option value="<?= $row['id'] ?>" <?= isset($tid) && $tid == $row['id'] ? "selected" : "" ?>><?= strtoupper($row['task']) ?></option>
-                                <?php endwhile; ?>
-                            </select>
-                        </div>
-                        <div class="form-group col-md-4">
-                            <button class="btn btn-primary btn-flat btn-sm"><i class="fa fa-filter"></i> Filtro</button>
-                            <button class="btn btn-sm btn-flat btn-success" type="button" id="print"><i class="fa fa-print"></i> Imprimir</button>
-                            <button class="btn btn-sm btn-flat btn-success" type="button" id="generate_chart"><i class="fa fa-chart-bar"></i> Generar Gráfica</button>
-                        </div>
-                    </div>
-                </form>
-            </fieldset>
-        </div>
         <div id="outprint">
+            <style>
+                #sys_logo {
+                    object-fit: cover;
+                    object-position: center center;
+                    width: 6.5em;
+                    height: 6.5em;
+                }
+            </style>
             <div class="container-fluid">
                 <div class="row">
-                    <div class="col-12 text-center">
-                        <h4><b>Reporte de Tiempo Por Tarea</b></h4>
-                        <h5><b><?= $task ?></b></h5>
-                        <h5><b>Hasta</b></h5>
-                        <h5><b><?= date("F d, Y") ?></b></h5>
+                    <div class="col-2 d-flex justify-content-center align-items-center">
+                        <img src="<?= validate_image($_settings->info('logo')) ?>" class="img-circle" id="sys_logo" alt="System Logo">
                     </div>
+                    <div class="col-8">
+                        <h4 class="text-center"><b><?= $_settings->info('name') ?></b></h4>
+                        <h3 class="text-center"><b>Reporte de tiempo trabajado por Tarea</b></h3>
+                        <h5 class="text-center"><b>Hasta</b></h5>
+                        <h5 class="text-center"><b><?= date("F d, Y") ?></b></h5>
+                    </div>
+                    <div class="col-2"></div>
                 </div>
                 <table class="table table-bordered table-hover table-striped">
                     <colgroup>
                         <col width="5%">
+                        <col width="15%">
                         <col width="25%">
-                        <col width="20%">
-                        <col width="20%">
+                        <col width="25%">
                         <col width="15%">
                         <col width="15%">
                     </colgroup>
                     <thead>
                         <tr class="bg-gradient-primary text-light">
                             <th>#</th>
-                            <th>Tarea</th>
-                            <th>Inicio Real</th>
-                            <th>Fin Real</th>
-                            <th>Duración</th>
-                            <th>Progreso (%)</th>
+                            <th>Fecha de Ingreso</th>
+                            <th>Nombre de la Tarea</th>
+                            <th>Total Tiempo Trabajado</th>
+                            <th>Total de Empleados</th>
+                            <th>Estado</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php
                         $i = 1;
-                        $qry = $conn->query("SELECT * FROM `task_list` WHERE id = '{$tid}'");
+                        $qry = $conn->query("SELECT * from `project_list` where delete_flag = 0 order by `name` asc ");
                         while ($row = $qry->fetch_assoc()):
-                            $duration = duration($row['actual_start_date'], $row['actual_end_date']);
+                            $row['total_duration'] = $conn->query("SELECT SUM(duration) FROM `report_list` where project_id = '{$row['id']}'")->fetch_array()[0];
+                            $row['total_employee'] = $conn->query("SELECT distinct(employee_id) FROM `report_list` where project_id = '{$row['id']}'")->num_rows;
                         ?>
                             <tr>
-                                <td class="text-center"><?= $i++; ?></td>
-                                <td><?= $row['task'] ?></td>
-                                <td><?= $row['actual_start_date'] ?></td>
-                                <td><?= $row['actual_end_date'] ?></td>
-                                <td><?= $duration ?></td>
-                                <td><?= $row['progress'] ?>%</td>
+                                <td class="text-center"><?php echo $i++; ?></td>
+                                <td class=""><?php echo date("Y-m-d H:i", strtotime($row['date_created'])) ?></td>
+                                <td class="">
+                                    <p class="m-0 truncate-1"><?php echo $row['name'] ?></p>
+                                </td>
+                                <td class="">
+                                    <p class="m-0 truncate-1 text-right"><?php echo duration($row['total_duration']) ?></p>
+                                </td>
+                                <td class="">
+                                    <p class="m-0 truncate-1 text-right"><?php echo number_format($row['total_employee']) ?></p>
+                                </td>
+                                <td class="text-center">
+                                    <?php
+                                    switch ($row['status']) {
+                                        case 0:
+                                            echo '<span class="rounded-pill badge badge-success bg-gradient-teal px-3">Nuevo</span>';
+                                            break;
+                                        case 1:
+                                            echo '<span class="rounded-pill badge badge-success bg-gradient-teal px-3">En Progreso</span>';
+                                            break;
+                                        case 2:
+                                            echo '<span class="rounded-pill badge badge-success bg-gradient-teal px-3">En Planificación</span>';
+                                            break;
+                                        case 3:
+                                            echo '<span class="rounded-pill badge badge-primary bg-gradient-primary px-3">Terminado</span>';
+                                            break;
+                                        case 4:
+                                            echo '<span class="rounded-pill badge badge-dark bg-gradient-dark px-3 text-light">Cerrado</span>';
+                                            break;
+                                    }
+                                    ?>
+                                </td>
                             </tr>
                         <?php endwhile; ?>
-                        <?php if ($qry->num_rows <= 0): ?>
-                            <tr>
-                                <th colspan="6">
-                                    <center>Sin Datos que Mostrar</center>
-                                </th>
-                            </tr>
-                        <?php endif; ?>
-                        <?php
-                        if (isset($_GET['start_date']) && isset($_GET['end_date'])) {
-                            $start_date = $_GET['start_date'];
-                            $end_date = $_GET['end_date'];
-
-                            $qry = $conn->query("SELECT task, SUM(TIMESTAMPDIFF(MINUTE, actual_start_date, actual_end_date)) as total_minutes 
-                         FROM `task_list` 
-                         WHERE DATE(actual_start_date) BETWEEN '{$start_date}' AND '{$end_date}'
-                         GROUP BY task 
-                         ORDER BY task ASC");
-                            $data = [];
-                            while ($row = $qry->fetch_assoc()) {
-                                $data[] = [
-                                    'task' => $row['task'],
-                                    'minutes' => $row['total_minutes']
-                                ];
-                            }
-                            echo json_encode($data);
-                            exit;
-                        }
-                        ?>
-
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-    $(document).ready(function () {
-        $('#generate_chart').click(function () {
-            const start_date = $('#start_date').val();
-            const end_date = $('#end_date').val();
-
-            if (!start_date || !end_date) {
-                alert('Por favor, selecciona un rango de fechas.');
-                return;
-            }
-
-            $.ajax({
-                url: '', // La misma página actual
-                method: 'GET',
-                data: { start_date, end_date },
-                dataType: 'json',
-                success: function (response) {
-                    if (response.length === 0) {
-                        alert('No hay datos para el rango seleccionado.');
-                        return;
-                    }
-
-                    $('#chart-container').show();
-
-                    const labels = response.map(item => item.task);
-                    const data = response.map(item => item.minutes);
-
-                    const ctx = document.getElementById('taskChart').getContext('2d');
-                    new Chart(ctx, {
-                        type: 'bar',
-                        data: {
-                            labels: labels,
-                            datasets: [{
-                                label: 'Minutos Trabajados',
-                                data: data,
-                                backgroundColor: 'rgba(54, 162, 235, 0.6)',
-                                borderColor: 'rgba(54, 162, 235, 1)',
-                                borderWidth: 1
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            scales: {
-                                y: {
-                                    beginAtZero: true
-                                }
-                            }
-                        }
-                    });
-                },
-                error: function (err) {
-                    console.error(err);
-                    alert('Hubo un error al generar la gráfica.');
-                }
-            });
-        });
-    });
-</script>
 <script>
     $(document).ready(function() {
-        $('.select2').select2({
-            width: '100%'
-        })
-        $('#filter').submit(function(e) {
-            e.preventDefault();
-            location.href = './?page=reports/by_Task&' + $(this).serialize();
-        })
         $('#print').click(function() {
             start_loader()
             var _p = $('#outprint').clone()
             var _h = $('head').clone()
             var _el = $('<div>')
-            _h.find("title").text("Reporte de Tiempo Por Tarea")
+            _h.find("title").text("Reporte de Tiempo Trabajado")
             _p.find('tr.text-light').removeClass('text-light bg-gradient-primary')
             _el.append(_h)
             _el.append(_p)

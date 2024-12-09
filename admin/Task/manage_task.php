@@ -1,12 +1,18 @@
 <?php
 require_once('../../config.php');
+
+// Verificar si se pasa un 'id' a través de GET
 if (isset($_GET['id'])) {
-    $qry = $conn->query("SELECT * FROM `task_list` where project_id = '{$_GET['id']}'");
+    // Utilizar una consulta preparada para evitar inyecciones SQL
+    $stmt = $conn->prepare("SELECT * FROM `task_list` WHERE `id` = ?");
+    $stmt->bind_param("i", $_GET['id']);
+    $stmt->execute();
+    $qry = $stmt->get_result();
+
     if ($qry->num_rows > 0) {
-        $res = $qry->fetch_array();
+        $res = $qry->fetch_assoc();
         foreach ($res as $k => $v) {
-            if (!is_numeric($k))
-                $$k = $v;
+            $$k = $v;
         }
     }
 }
@@ -18,13 +24,14 @@ if (isset($_GET['id'])) {
         object-fit: scale-down;
     }
 </style>
+
 <div class="container-fluid">
     <form action="" id="task-form">
-        <input type="hidden" name="project_id" value="<?php echo isset($project_id) ? $project_id : '' ?>">
+        <input type="hidden" name="id" value="<?php echo isset($id) ? $id : '' ?>">
 
         <div class="form-group">
-            <label for="task" class="control-label">Tarea</label>
-            <input type="text" name="task" id="task" class="form-control form-control-border" placeholder="Ingresa Tarea" value="<?php echo isset($task) ? $task : '' ?>" required>
+            <label for="task" class="control-label">Nombre de la Tarea</label>
+            <input type="text" name="task" id="task" class="form-control form-control-border" placeholder="Ingresa Nombre de la Tarea" value="<?php echo isset($task) ? $task : '' ?>" required>
         </div>
 
         <div class="form-group">
@@ -33,140 +40,98 @@ if (isset($_GET['id'])) {
         </div>
 
         <div class="form-group">
-            <label for="estimated_start_date" class="control-label">Fecha Estimada de Inicio</label>
-            <input type="date" name="estimated_start_date" id="estimated_start_date" class="form-control form-control-border" value="<?php echo isset($estimated_start_date) ? $estimated_start_date : '' ?>">
+            <label for="estimated_start_date" class="control-label">Fecha Est. Inicio</label>
+            <input type="date" name="estimated_start_date" id="estimated_start_date" class="form-control form-control-border" value="<?php echo isset($estimated_start_date) ? $estimated_start_date : '' ?>" required>
         </div>
 
         <div class="form-group">
-            <label for="estimated_end_date" class="control-label">Fecha Estimada de Fin</label>
-            <input type="date" name="estimated_end_date" id="estimated_end_date" class="form-control form-control-border" value="<?php echo isset($estimated_end_date) ? $estimated_end_date : '' ?>">
+            <label for="estimated_end_date" class="control-label">Fecha Est. Fin</label>
+            <input type="date" name="estimated_end_date" id="estimated_end_date" class="form-control form-control-border" value="<?php echo isset($estimated_end_date) ? $estimated_end_date : '' ?>" required>
         </div>
 
         <div class="form-group">
-            <label for="actual_start_date" class="control-label">Fecha Real de Inicio</label>
-            <input type="date" name="actual_start_date" id="actual_start_date" class="form-control form-control-border" value="<?php echo isset($actual_start_date) ? $actual_start_date : '' ?>">
-        </div>
-
-        <div class="form-group">
-            <label for="actual_end_date" class="control-label">Fecha Real de Fin</label>
-            <input type="date" name="actual_end_date" id="actual_end_date" class="form-control form-control-border" value="<?php echo isset($actual_end_date) ? $actual_end_date : '' ?>">
+            <label for="responsible" class="control-label">Responsable</label>
+            <input type="text" name="responsible" id="responsible" class="form-control form-control-border" placeholder="Ingresa Responsable" value="<?php echo isset($responsible) ? $responsible : '' ?>" required>
         </div>
 
         <div class="form-group">
             <label for="status" class="control-label">Estado</label>
             <select name="status" id="status" class="form-control form-control-border" required>
-                <option value="Pendiente" <?php echo (isset($status) && $status == 'Nuevo') ? 'selected' : '' ?>>Nuevo</option>
+                <option value="Pendiente" <?php echo (isset($status) && $status == 'Pendiente') ? 'selected' : '' ?>>Pendiente</option>
                 <option value="En Proceso" <?php echo (isset($status) && $status == 'En Proceso') ? 'selected' : '' ?>>En Proceso</option>
                 <option value="Completada" <?php echo (isset($status) && $status == 'Completada') ? 'selected' : '' ?>>Completada</option>
                 <option value="Cancelada" <?php echo (isset($status) && $status == 'Cancelada') ? 'selected' : '' ?>>Cancelada</option>
             </select>
         </div>
+    </form>
+</div>
 
-        <div class="form-group">
-            <label for="responsible" class="control-label">Empleados de la Tarea</label>
-            <select name="responsible" id="responsible" class="form-control form-control-border" required>
-                <option value="">Selecciona un Empleado</option>
-                <?php
-                // Consultar los empleados disponibles en la base de datos
-                $employees_query = $conn->query("SELECT id, CONCAT(firstname, ' ', lastname) AS full_name FROM employee_list WHERE status = 1 ORDER BY lastname ASC");
+<script>
+    function validateDates() {
+        // Obtener los valores de las fechas
+        const startDate = document.getElementById('start_date').value;
+        const endDate = document.getElementById('end_date').value;
 
-                // Mostrar los empleados disponibles en el campo <select>
-                while ($employee = $employees_query->fetch_assoc()):
-                ?>
-                    <option value="<?php echo $employee['id']; ?>"><?php echo $employee['full_name']; ?></option>
-                <?php endwhile; ?>
-            </select>
-        </div>
+        // Si ambos campos tienen valores
+        if (startDate && endDate) {
+            const startDateObj = new Date(startDate);
+            const endDateObj = new Date(endDate);
 
+            // Verificar que la fecha de inicio no sea mayor que la de fin
+            if (startDateObj > endDateObj) {
+                alert("La Fecha Est. Inicio no puede ser mayor que la Fecha Est. Fin.");
+                document.getElementById('start_date').value = ""; // Limpiar campo
+            }
 
-        <div class="form-group">
-            <label for="task_type" class="control-label">Proyecto al que pertenece</label>
-            <select name="task_type" id="task_type" class="form-control form-control-border" required>
-                <option value="">Selecciona un Proyecto</option>
-                <?php
-                // Consultar los proyectos disponibles en la base de datos
-                $projects_query = $conn->query("SELECT id, title FROM project_list WHERE delete_flag = 0 ORDER BY title ASC");
-
-                // Mostrar los proyectos disponibles en el campo <select>
-                while ($project = $projects_query->fetch_assoc()):
-                ?>
-                    <option value="<?php echo $project['id']; ?>"><?php echo $project['title']; ?></option>
-                <?php endwhile; ?>
-            </select>
-        </div>
-
-
-        <script>
-            // Script para seleccionar el proyecto
-            document.querySelectorAll('.select-project-btn').forEach(function(button) {
-                button.addEventListener('click', function() {
-                    // Obtener el ID y el título del proyecto seleccionado
-                    var projectId = this.getAttribute('data-id');
-                    var projectTitle = this.getAttribute('data-title');
-
-                    // Establecer el valor del input con el ID del proyecto seleccionado
-                    document.getElementById('task_type').value = projectTitle; // Puedes cambiar esto si prefieres guardar el ID
-                });
-            });
-            $(function() {
-                $('#uni_modal #task-form').submit(function(e) {
-                    e.preventDefault(); // Prevenir envío estándar del formulario
-                    var _this = $(this);
-                    $('.pop-msg').remove(); // Eliminar mensajes previos de error o éxito
-
-                    // Crear contenedor para mensajes dinámicos
-                    var el = $('<div>');
-                    el.addClass("pop-msg alert");
-                    el.hide();
-
-                    start_loader(); // Mostrar loader mientras se procesa
-
-                    var formData = new FormData(this); // Recoger los datos del formulario
-
-                    // Realizar la solicitud AJAX
-                    $.ajax({
-                        url: _base_url_ + "classes/Master.php?f=save_task", // Ruta hacia el backend
-                        data: formData,
-                        cache: false,
-                        contentType: false,
-                        processData: false,
-                        method: 'POST',
-                        dataType: 'json',
-                        error: function(err) {
-                            // Manejar errores de AJAX
-                            console.log("Error de AJAX:", err);
-                            alert_toast("Ocurrió un error. Revisa la consola para más detalles.", 'error');
-                            end_loader();
-                        },
-                        success: function(resp) {
-                            // Procesar respuesta del servidor
-                            console.log("Respuesta del servidor:", resp); // Depuración
-
-                            if (resp.status === 'success') {
-                                // Mensaje de éxito y recargar página
-                                alert_toast(resp.msg, 'success');
-                                setTimeout(function() {
-                                    location.reload();
-                                }, 1500);
-                            } else {
-                                // Mostrar errores devueltos por el backend
-                                el.addClass("alert-danger");
-                                if (resp.error) {
-                                    el.text("Error: " + resp.error);
-                                } else if (resp.msg) {
-                                    el.text(resp.msg);
-                                } else {
-                                    el.text("Se produjo un error desconocido.");
-                                }
-                                _this.prepend(el);
-                            }
-                            el.show('slow'); // Mostrar el mensaje de error
-                            $('html,body,.modal').animate({
-                                scrollTop: 0
-                            }, 'fast');
-                            end_loader(); // Ocultar loader
-                        }
-                    });
-                });
-            });
-        </script>
+            // Verificar que la fecha de fin no sea menor que la de inicio
+            if (endDateObj < startDateObj) {
+                alert("La Fecha Est. Fin no puede ser menor que la Fecha Est. Inicio.");
+                document.getElementById('end_date').value = ""; // Limpiar campo
+            }
+        }
+    }
+    $(function() {
+        $('#uni_modal #project-form').submit(function(e) {
+            e.preventDefault();
+            var _this = $(this)
+            $('.pop-msg').remove()
+            var el = $('<div>')
+            el.addClass("pop-msg alert")
+            el.hide()
+            start_loader();
+            $.ajax({
+                url: _base_url_ + "classes/Master.php?f=save_task",
+                data: new FormData($(this)[0]),
+                cache: false,
+                contentType: false,
+                processData: false,
+                method: 'POST',
+                type: 'POST',
+                dataType: 'json',
+                error: err => {
+                    console.log(err)
+                    alert_toast("Ocurrió un error.", 'error');
+                    end_loader();
+                },
+                success: function(resp) {
+                    if (resp.status == 'success') {
+                        location.reload();
+                    } else if (!!resp.msg) {
+                        el.addClass("alert-danger")
+                        el.text(resp.msg)
+                        _this.prepend(el)
+                    } else {
+                        el.addClass("alert-danger")
+                        el.text("Se produjo un error debido a un motivo desconocido.")
+                        _this.prepend(el)
+                    }
+                    el.show('slow')
+                    $('html,body,.modal').animate({
+                        scrollTop: 0
+                    }, 'fast')
+                    end_loader();
+                }
+            })
+        })
+    })
+</script>

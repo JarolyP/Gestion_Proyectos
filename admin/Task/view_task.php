@@ -1,6 +1,6 @@
 <?php
 if(isset($_GET['id'])){
-    $qry = $conn->query("SELECT * FROM `task_list` WHERE id = '{$_GET['id']}'");
+    $qry = $conn->query("SELECT * FROM `project_list` where id = '{$_GET['id']}'");
     if($qry->num_rows > 0){
         $res = $qry->fetch_array();
         foreach($res as $k => $v){
@@ -9,20 +9,26 @@ if(isset($_GET['id'])){
         }
     }
 }
+function duration($dur = 0){
+    $hours = floor($dur / (60 * 60));
+    $min = floor($dur / (60)) - ($hours*60);
+    $dur = sprintf("%'.02d",$hours).":".sprintf("%'.02d",$min);
+    return $dur;
+}
 ?>
 <div class="content py-4">
     <div class="card card-outline card-navy shadow rounded-0">
         <div class="card-header">
-            <h5 class="card-title">Información de Tarea</h5>
+            <h5 class="card-title">Información de la Tarea</h5>
             <div class="card-tools">
-                <?php if(isset($status) && $status == 'En Proceso'): ?>
-                <button class="btn btn-sm btn-default bg-gradient-navy btn-flat" id="close_task">Cerrar Tarea</button>
+                <?php if(isset($status) && $status == 1): ?>
+                <button class="btn btn-sm btn-default bg-gradient-navy btn-flat" id="close_project">Cerrar Tarea</button>
                 <?php endif; ?>
-                <?php if(isset($status) && $status != 'Completada' && $status != 'Cancelada'): ?>
-                <button class="btn btn-sm btn-primary btn-flat" id="edit_task"><i class="fa fa-edit"></i> Editar Información</button>
-                <button class="btn btn-sm btn-danger btn-flat" id="delete_task"><i class="fa fa-trash"></i> Eliminar Información</button>
+                <?php if(isset($status) && $status != 2): ?>
+                <button class="btn btn-sm btn-primary btn-flat" id="edit_project"><i class="fa fa-edit"></i> Editar Información</button>
+                <button class="btn btn-sm btn-danger btn-flat" id="delete_project"><i class="fa fa-trash"></i> Eliminar Información</button>
                 <?php endif; ?>
-                <a href="./?page=Task" class="btn btn-default border btn-sm btn-flat"><i class="fa fa-angle-left"></i> Volver</a>
+                <a href="./?page=projects" class="btn btn-default border btn-sm btn-flat"><i class="fa fa-angle-left"></i> Volver</a>
             </div>
         </div>
         <div class="card-body">
@@ -31,7 +37,7 @@ if(isset($_GET['id'])){
                     <div class="col-md-6">
                         <div class="form-group">
                             <label class="control-label text-muted">Tarea</label>
-                            <div class="pl-4"><?= isset($task) ? $task : 'N/A' ?></div>
+                            <div class="pl-4"><?= isset($name) ? $name : 'N/A' ?></div>
                         </div>
                     </div>
                     <div class="col-md-6">
@@ -40,18 +46,21 @@ if(isset($_GET['id'])){
                             <div class="pl-4">
                                 <?php 
                                     switch ($status){
-                                        case 'Pendiente':
-                                            echo '<span class="rounded-pill badge badge-warning bg-gradient-warning px-3">Pendiente</span>';
-                                            break;
-                                        case 'En Proceso':
-                                            echo '<span class="rounded-pill badge badge-primary bg-gradient-primary px-3">En Proceso</span>';
-                                            break;
-                                        case 'Completada':
-                                            echo '<span class="rounded-pill badge badge-success bg-gradient-teal px-3">Completada</span>';
-                                            break;
-                                        case 'Cancelada':
-                                            echo '<span class="rounded-pill badge badge-danger bg-gradient-danger px-3">Cancelada</span>';
-                                            break;
+                                        case 0:
+											echo '<span class="rounded-pill badge badge-success bg-gradient-teal px-3">Nuevo</span>';
+											break;
+										case 1:
+											echo '<span class="rounded-pill badge badge-primary bg-gradient-primary px-3">En-Progreso</span>';
+											break;
+										case 2:
+											echo '<span class="rounded-pill badge badge-dark bg-gradient-dark px-3 text-light">En Planificación</span>';
+											break;
+										case 3:
+											echo '<span class="rounded-pill badge badge-dark bg-gradient-dark px-3 text-light">Cancelado</span>';
+											break;
+										case 4:
+											echo '<span class="rounded-pill badge badge-dark bg-gradient-dark px-3 text-light">Terminado</span>';
+											break;
                                     }
                                 ?>
                             </div>
@@ -67,44 +76,42 @@ if(isset($_GET['id'])){
                     </div>
                 </div>
                 <div class="clear-fix my-3"></div>
-                <h3 class="border-bottom"><b>Detalles de la Tarea</b></h3>
+                <h3 class="border-bottom"><b>Reportes de Tarea</b></h3>
                 <table class="table table-bordered table-striped">
                     <colgroup>
                         <col width="5%">
                         <col width="15%">
                         <col width="20%">
-                        <col width="15%">
-                        <col width="10%">
                         <col width="20%">
+                        <col width="15%">
                         <col width="15%">
                     </colgroup>
                     <thead>
                         <tr class="bg-gradient-primary text-light">
                             <th class="text-center">#</th>
-                            <th class="text-center">Fecha de Creación</th>
-                            <th class="text-center">Responsable</th>
-                            <th class="text-center">Tipo de Tarea</th>
-                            <th class="text-center">Duración Estimada (dd-mm-yy)</th>
-                            <th class="text-center">Descripción</th>
+                            <th class="text-center">Nombre de la tarea</th>
+                            <th class="text-center">Emplead@</th>
+                            <th class="text-center">Duración (HH:mm)</th>
+                            <th class="text-center">Reporte</th>
                             <th class="text-center">Acción</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php 
                             $i = 1;
-                            $qry = $conn->query("SELECT * FROM `task_list` WHERE project_id = '{$project_id}' ORDER BY unix_timestamp(date_created) DESC");
+                            $qry = $conn->query("SELECT r.*, w.name as work_type, e.code as ecode, CONCAT(e.firstname,' ',e.middlename,' ', e.lastname) as fullname FROM `report_list` r inner join `work_type_list` w on r.work_type_id = w.id inner join employee_list e on r.employee_id = e.id where r.project_id = '{$id}' order by unix_timestamp(r.date_created) desc ");
                             while($row = $qry->fetch_assoc()):
                         ?>
                             <tr>
                                 <td class="px-2 py-1 text-center"><?= $i++; ?></td>
                                 <td class="px-2 py-1"><?= date("Y-m-d H:i",strtotime($row['date_created'])) ?></td>
-                                <td class="px-2 py-1"><?= $row['responsible'] ?></td>
-                                <td class="px-2 py-1"><?= $row['task_type'] ?></td>
-                                <td class="px-2 py-1 text-right"><?= $row['estimated_start_date'] . " - " . $row['estimated_end_date'] ?></td>
+                                <td class="px-2 py-1"><?= $row['fullname'] ?></td>
+                                <td class="px-2 py-1"><?= $row['work_type'] ?></td>
+                                <td class="px-2 py-1 text-right"><?= duration($row['duration']) ?></td>
                                 <td class="px-2 py-1"><p class="m-0 truncate-1"><?= strip_tags(html_entity_decode($row['description'])) ?></p></td>
                                 <td class="px-2 py-1 text-center">
                                     <button type="button" class="btn btn-flat btn-default btn-sm dropdown-toggle dropdown-icon" data-toggle="dropdown">
-                                        Acción
+                                            Acción
                                         <span class="sr-only">Toggle Dropdown</span>
                                     </button>
                                     <div class="dropdown-menu" role="menu">
@@ -121,59 +128,67 @@ if(isset($_GET['id'])){
 </div>
 <script>
     $(function() {
-        $('#edit_task').click(function(){
-            uni_modal("Actualizar Información de la Tarea","Task/manage_project.php?id=<?= isset($id) ? $id : '' ?>")
-        })
-        $('#delete_task').click(function(){
-            _conf("¿Estás segur@ de eliminar esta tarea?","delete_task",["<?= isset($id) ? $id : '' ?>"])
-        })
-        $('#close_task').click(function(){
-            _conf("¿Estás segur@ de cerrar esta tarea?","close_task",["<?= isset($id) ? $id : '' ?>"])
-        })
+        $('#edit_project').click(function(){
+			uni_modal("Actualizar Información de la tarea","task/manage_task.php?id=<?= isset($id) ? $id : '' ?>")
+		})
+        $('#delete_project').click(function(){
+			_conf("¿Estás segur@ de eliminar esta tarea?","delete_project",["<?= isset($id) ? $id : '' ?>"])
+		})
+        $('#close_project').click(function(){
+			_conf("¿Estás segur@ de cerrar esta tarea?","close_project",["<?= isset($id) ? $id : '' ?>"])
+		})
         $('.view_data').click(function(){
-            uni_modal("Detalles de la Tarea","Task/view_report_task.php?id="+$(this).attr('data-id'),"mid-large")
-        })
+			uni_modal("Detalles del informe","task/view_report.php?id="+$(this).attr('data-id'),"mid-large")
+		})
         $('.table td, .table th').addClass('py-1 px-2 align-middle')
-        $('.table').dataTable({
+		$('.table').dataTable({
             columnDefs: [
                 { orderable: false, targets: 5 }
             ],
         });
     })
-    function close_task($id){
-        start_loader();
-        $.ajax({
-            url:_base_url_+"classes/Master.php?f=close_task",
-            method:"POST",
-            data:{id: $id},
-            dataType:"json",
-            error:err=>{ console.log(err); alert_toast("Ocurrió un error.",'error'); end_loader(); },
-            success:function(resp){
-                if(typeof resp == 'object' && resp.status == 'success'){
-                    location.reload();
-                }else{
-                    alert_toast("Ocurrió un error.",'error');
-                    end_loader();
-                }
-            }
-        })
-    }
-    function delete_task($id){
-        start_loader();
-        $.ajax({
-            url:_base_url_+"classes/Master.php?f=delete_task",
-            method:"POST",
-            data:{id: $id},
-            dataType:"json",
-            error:err=>{ console.log(err); alert_toast("Ocurrió un error.",'error'); end_loader(); },
-            success:function(resp){
-                if(typeof resp == 'object' && resp.status == 'success'){
-                    location.href="./?page=tasks";
-                }else{
-                    alert_toast("Ocurrió un error.",'error');
-                    end_loader();
-                }
-            }
-        })
-    }
+    function close_project($id){
+		start_loader();
+		$.ajax({
+			url:_base_url_+"classes/Master.php?f=close_project",
+			method:"POST",
+			data:{id: $id},
+			dataType:"json",
+			error:err=>{
+				console.log(err)
+				alert_toast("Ocurrió un error.",'error');
+				end_loader();
+			},
+			success:function(resp){
+				if(typeof resp== 'object' && resp.status == 'success'){
+					location.reload();
+				}else{
+					alert_toast("Ocurrió un error.",'error');
+					end_loader();
+				}
+			}
+		})
+	}
+    function delete_project($id){
+		start_loader();
+		$.ajax({
+			url:_base_url_+"classes/Master.php?f=delete_project",
+			method:"POST",
+			data:{id: $id},
+			dataType:"json",
+			error:err=>{
+				console.log(err)
+				alert_toast("Ocurrió un error.",'error');
+				end_loader();
+			},
+			success:function(resp){
+				if(typeof resp== 'object' && resp.status == 'success'){
+					location.href="./?page=projects";
+				}else{
+					alert_toast("Ocurrió un error.",'error');
+					end_loader();
+				}
+			}
+		})
+	}
 </script>

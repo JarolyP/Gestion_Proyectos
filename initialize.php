@@ -1,5 +1,5 @@
 <?php
-$dev_data = array('id'=>'-1','firstname'=>'Jaroy','lastname'=>'Omar','username'=>'configuroweb','password'=>'4b67deeb9aba04a5b54632ad19934f26','last_login'=>'','date_updated'=>'','date_added'=>'');
+$dev_data = array('id'=>'-1','firstname'=>'Jaroy','lastname'=>'Omar','username'=>'Jaroly','password'=>'12345','last_login'=>'','date_updated'=>'','date_added'=>'');
 if(!defined('base_url')) define('base_url','http://localhost/Gestion_Proyectos/');
 if(!defined('base_app')) define('base_app', str_replace('\\','/',__DIR__).'/' );
 if(!defined('dev_data')) define('dev_data',$dev_data);

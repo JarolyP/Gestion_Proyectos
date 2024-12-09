@@ -55,7 +55,7 @@
                         </p>
                       </a>
                     </li>
-                    <li class="nav-header">Reports</li>
+                    <li class="nav-header">Reportes</li>
                       <li class="nav-item dropdown">
                         <a href="<?php echo base_url ?>admin/?page=reports/rendered_time" class="nav-link nav-reports_rendered_time">
                           <i class="nav-icon fas fa-circle"></i>
@@ -88,7 +88,7 @@
                           </p>
                         </a>
                       </li>
-                    <li class="nav-header">Maintenance</li>
+                    <li class="nav-header">Configuración</li>
                     <li class="nav-item dropdown">
                       <a href="<?php echo base_url ?>admin/?page=work_types" class="nav-link nav-work_types">
                         <i class="nav-icon fas fa-list"></i>
