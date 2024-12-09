@@ -57,14 +57,17 @@
                             <td class="text-center">
                                 <?php
                                 switch ($row['status']) {
-                                    case 'Pendiente':
-                                        echo '<span class="rounded-pill badge badge-warning px-3">Pendiente</span>';
+                                    case 'Nuevo':
+                                        echo '<span class="rounded-pill badge badge-success px-3">Nuevo</span>';
+                                        break;
+                                    case 'En Planificación':
+                                        echo '<span class="rounded-pill badge badge-warning px-3">En Planificación</span>';
                                         break;
                                     case 'En Proceso':
                                         echo '<span class="rounded-pill badge badge-primary px-3">En Proceso</span>';
                                         break;
-                                    case 'Completada':
-                                        echo '<span class="rounded-pill badge badge-success px-3">Completada</span>';
+                                    case 'Terminado':
+                                        echo '<span class="rounded-pill badge badge-success px-3">Terminado</span>';
                                         break;
                                     case 'Cancelada':
                                         echo '<span class="rounded-pill badge badge-danger px-3">Cancelada</span>';

@@ -41,7 +41,7 @@
                       </a>
                     </li>
                     <li class="nav-item dropdown">
-                      <a href="<?php echo base_url ?>?page=projects" class="nav-link nav-task">
+                      <a href="<?php echo base_url ?>?page=task" class="nav-link nav-task">
                         <i class="nav-icon fas fa-tasks"></i>
                         <p>
                           Tareas

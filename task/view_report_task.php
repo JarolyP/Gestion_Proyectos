@@ -61,7 +61,7 @@ function duration($dur = 0){
     $(function(){
         $('#edit_report').click(function(){
             setTimeout(() => {
-                uni_modal("Editar Reporte","projects/manage_report.php?id=<?= isset($id) ? $id : '' ?>",'mid-large')
+                uni_modal("Editar Reporte","task/manage_report_task.php?id=<?= isset($id) ? $id : '' ?>",'mid-large')
             }, 500);
             $('.modal').modal('hide')
         })

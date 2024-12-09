@@ -8,9 +8,9 @@
 </style>
 <div class="card card-outline card-primary rounded-0 shadow">
 	<div class="card-header">
-		<h3 class="card-title">Lista de Empleados</h3>
+		<h3 class="card-title">Lista de Usuarios</h3>
 		<div class="card-tools">
-			<a href="javascript:void(0)" id="create_new" class="btn btn-flat btn-sm btn-primary"><span class="fas fa-plus"></span>  Agregar Nuev@ Emplead@</a>
+			<a href="javascript:void(0)" id="create_new" class="btn btn-flat btn-sm btn-primary"><span class="fas fa-plus"></span>  Agregar Nuev@ Usuario@</a>
 		</div>
 	</div>
 	<div class="card-body">
@@ -28,7 +28,7 @@
 					<tr class="bg-gradient-primary text-light">
 						<th>#</th>
 						<th>Fecha de Creación</th>
-						<th>Código de Empleado</th>
+						<th>Código de Usuario</th>
 						<th>Nombre</th>
 						<th>Estado</th>
 						<th>Acción</th>
